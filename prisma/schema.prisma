@@ -1,0 +1,656 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * =========================
+ * ENUMS
+ * =========================
+ */
+
+enum UserRole {
+  CUSTOMER
+  PARTNER
+  ADMIN
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PromotionType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_DELIVERY
+}
+
+enum LoyaltyLevel {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum WalletTransactionType {
+  TOP_UP
+  ORDER_PAYMENT
+  REFUND
+  BONUS_EARNED
+  BONUS_REDEEMED
+  REFERRAL_REWARD
+  ADMIN_ADJUSTMENT
+}
+
+enum ReferralStatus {
+  PENDING
+  REGISTERED
+  COMPLETED
+  REWARDED
+}
+
+enum SupportTopic {
+  MISSING_ITEM
+  LATE_DELIVERY
+  PAYMENT_PROBLEM
+  OTHER
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SupportSender {
+  CUSTOMER
+  SUPPORT
+  ADMIN
+}
+
+/**
+ * =========================
+ * USER / AUTH
+ * =========================
+ */
+
+model User {
+  id              Int       @id @default(autoincrement())
+  name            String
+  email           String    @unique
+  phone           String?
+  passwordHash    String
+  avatarUrl       String?
+  role            UserRole  @default(CUSTOMER)
+  isActive        Boolean   @default(true)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  referralCode    String    @unique @default(cuid())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  addresses            Address[]
+  orders               Order[]
+  favorites            Favorite[]
+  wallet               Wallet?
+  restaurants          Restaurant[]          @relation("RestaurantOwner")
+  referralsSent        Referral[]            @relation("ReferralInviter")
+  referralAccepted     Referral?             @relation("ReferralInvitedUser")
+  supportTickets       SupportTicket[]
+  restaurantReviews    RestaurantReview[]
+  productReviews       ProductReview[]
+  refreshTokens        RefreshToken[]
+  passwordResetTokens  PasswordResetToken[]
+  promotionRedemptions PromotionRedemption[]
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  remember  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/**
+ * =========================
+ * ADDRESSES
+ * =========================
+ */
+
+model Address {
+  id           Int      @id @default(autoincrement())
+  label        String?
+  city         String   @default("Yerevan")
+  district     String?
+  addressLine  String
+  apartment    String?
+  entrance     String?
+  floor        String?
+  instructions String?
+  latitude     Float?
+  longitude    Float?
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/**
+ * =========================
+ * RESTAURANTS
+ * =========================
+ */
+
+model Restaurant {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  slug               String   @unique
+  description        String?
+  logoUrl            String?
+  coverImageUrl      String?
+  phone              String?
+  email              String?
+  address            String
+  city               String   @default("Yerevan")
+  district           String?
+  latitude           Float?
+  longitude          Float?
+  foundedYear        Int?
+  deliveryMinMinutes Int      @default(20)
+  deliveryMaxMinutes Int      @default(40)
+  deliveryFee        Int      @default(0)
+  minimumOrder       Int      @default(0)
+  freeDeliveryFrom   Int?
+  ratingAverage      Float    @default(0)
+  reviewCount        Int      @default(0)
+  isAcceptingOrders  Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  ownerId Int?
+  owner   User? @relation("RestaurantOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  hours      RestaurantHour[]
+  cuisines   Cuisine[]
+  products   Product[]
+  reviews    RestaurantReview[]
+  promotions Promotion[]
+  orderItems OrderItem[]
+
+  @@index([ownerId])
+  @@index([isActive])
+}
+
+model RestaurantHour {
+  id       Int       @id @default(autoincrement())
+  day      DayOfWeek
+  opensAt  String?
+  closesAt String?
+  isClosed Boolean   @default(false)
+
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, day])
+  @@index([restaurantId])
+}
+
+model Cuisine {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  restaurants Restaurant[]
+}
+
+/**
+ * =========================
+ * PRODUCTS
+ * =========================
+ */
+
+model ProductCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  imageUrl  String?
+  emoji     String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products   Product[]
+  promotions Promotion[]
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  name          String
+  slug          String   @unique
+  description   String?
+  price         Int
+  currency      String   @default("AMD")
+  imageUrl      String?
+  ingredients   String[]
+  allergens     String[]
+  badge         String?
+  ratingAverage Float    @default(0)
+  reviewCount   Int      @default(0)
+  isAvailable   Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+
+  favorites  Favorite[]
+  reviews    ProductReview[]
+  orderItems OrderItem[]
+  promotions Promotion[]
+
+  @@index([restaurantId])
+  @@index([categoryId])
+  @@index([isActive, isAvailable])
+}
+
+/**
+ * =========================
+ * FAVORITES
+ * =========================
+ */
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+}
+
+/**
+ * =========================
+ * REVIEWS
+ * =========================
+ */
+
+model RestaurantReview {
+  id         Int      @id @default(autoincrement())
+  rating     Int
+  comment    String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantId])
+  @@index([userId])
+  @@index([orderId])
+}
+
+model ProductReview {
+  id         Int      @id @default(autoincrement())
+  rating     Int
+  comment    String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([userId])
+  @@index([orderId])
+}
+
+/**
+ * =========================
+ * PROMOTIONS
+ * =========================
+ */
+
+model Promotion {
+  id               Int           @id @default(autoincrement())
+  title            String
+  slug             String        @unique
+  description      String?
+  code             String?       @unique
+  imageUrl         String?
+  type             PromotionType
+  value            Int           @default(0)
+  minimumOrder     Int           @default(0)
+  maxDiscount      Int?
+  newCustomersOnly Boolean       @default(false)
+  isStackable      Boolean       @default(false)
+  usageLimit       Int?
+  perUserLimit     Int?
+  startsAt         DateTime?
+  endsAt           DateTime?
+  rules            Json?
+  isActive         Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  restaurants Restaurant[]
+  categories  ProductCategory[]
+  products    Product[]
+
+  orders      Order[]
+  redemptions PromotionRedemption[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([startsAt, endsAt])
+}
+
+model PromotionRedemption {
+  id             Int      @id @default(autoincrement())
+  discountAmount Int
+  createdAt      DateTime @default(now())
+
+  promotionId Int
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([promotionId])
+  @@index([userId])
+}
+
+/**
+ * =========================
+ * ORDERS
+ * =========================
+ */
+
+model Order {
+  id            Int           @id @default(autoincrement())
+  orderNumber   String        @unique
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  customerNote  String?
+
+  deliveryCity     String    @default("Yerevan")
+  deliveryDistrict String?
+  deliveryAddress  String
+  deliveryTime     String?
+  scheduledFor     DateTime?
+
+  subtotal         Int
+  deliveryFee      Int    @default(0)
+  discount         Int    @default(0)
+  walletCreditUsed Int    @default(0)
+  total            Int
+  currency         String @default("AMD")
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deliveredAt DateTime?
+  cancelledAt DateTime?
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  promotionId Int?
+  promotion   Promotion? @relation(fields: [promotionId], references: [id], onDelete: SetNull)
+
+  items               OrderItem[]
+  supportTickets      SupportTicket[]
+  walletTransactions  WalletTransaction[]
+  restaurantReviews   RestaurantReview[]
+  productReviews      ProductReview[]
+  promotionRedemption PromotionRedemption?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([promotionId])
+}
+
+model OrderItem {
+  id             Int      @id @default(autoincrement())
+  quantity       Int
+  productName    String
+  restaurantName String?
+  unitPrice      Int
+  lineTotal      Int
+  note           String?
+  createdAt      DateTime @default(now())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  restaurantId Int?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([restaurantId])
+}
+
+/**
+ * =========================
+ * WALLET / BONUSES
+ * =========================
+ */
+
+model Wallet {
+  id          Int          @id @default(autoincrement())
+  balance     Int          @default(0)
+  bonusPoints Int          @default(0)
+  level       LoyaltyLevel @default(BRONZE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id           Int                   @id @default(autoincrement())
+  type         WalletTransactionType
+  amount       Int                   @default(0)
+  points       Int                   @default(0)
+  description  String?
+  balanceAfter Int?
+  pointsAfter  Int?
+  createdAt    DateTime              @default(now())
+
+  walletId Int
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([walletId])
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+/**
+ * =========================
+ * REFERRALS
+ * =========================
+ */
+
+model Referral {
+  id           Int            @id @default(autoincrement())
+  invitedEmail String
+  referralCode String
+  status       ReferralStatus @default(PENDING)
+  rewardAmount Int            @default(1000)
+  createdAt    DateTime       @default(now())
+  completedAt  DateTime?
+  rewardedAt   DateTime?
+
+  inviterId Int
+  inviter   User @relation("ReferralInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  invitedUserId Int?  @unique
+  invitedUser   User? @relation("ReferralInvitedUser", fields: [invitedUserId], references: [id], onDelete: SetNull)
+
+  @@index([inviterId])
+  @@index([invitedEmail])
+  @@index([status])
+}
+
+/**
+ * =========================
+ * SUPPORT
+ * =========================
+ */
+
+model SupportTicket {
+  id           Int                 @id @default(autoincrement())
+  ticketNumber String              @unique
+  topic        SupportTopic
+  status       SupportTicketStatus @default(OPEN)
+  message      String
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  resolvedAt   DateTime?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderId Int?
+  order   Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  replies SupportTicketReply[]
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+}
+
+model SupportTicketReply {
+  id        Int           @id @default(autoincrement())
+  sender    SupportSender
+  message   String
+  createdAt DateTime      @default(now())
+
+  ticketId Int
+  ticket   SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+/**
+ * =========================
+ * NEWSLETTER
+ * =========================
+ */
+
+model NewsletterSubscriber {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  isActive       Boolean   @default(true)
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+}
