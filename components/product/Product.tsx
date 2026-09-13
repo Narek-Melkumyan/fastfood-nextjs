@@ -1,327 +1,1248 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
+
 import Link from "next/link";
-import { readStorage, writeStorage, type CartItem } from "../shared/storage";
-import { createEffects, requireElement } from "../shared/dom";
+
+import {
+  useCartStore,
+} from "@/store/cartStore";
 
 const pageStyles = `
+  .buy-sticky{
+    position:sticky;
+    top:calc(var(--nav-h) + 16px);
+  }
 
-        .buy-sticky{ position:sticky; top:calc(var(--nav-h) + 16px); }
-        .price-xl{ font-family:var(--font-display); font-size:2.5rem; font-weight:800; letter-spacing:-.04em; color:var(--ink); }
-    
+  .price-xl{
+    font-family:var(--font-display);
+    font-size:2.5rem;
+    font-weight:800;
+    letter-spacing:-.04em;
+    color:var(--ink);
+  }
+
+  .product-main-image{
+    width:100%;
+    height:auto;
+    aspect-ratio:4/3;
+    object-fit:cover;
+    border-radius:var(--r);
+  }
+
+  .product-description{
+    white-space:pre-line;
+  }
 `;
 
-export default function Product() {
-  const rootRef = useRef<HTMLDivElement | null>(null);
+export type ProductData = {
+  id: number;
 
-  useEffect(() => {
-    const mountedRoot = rootRef.current;
-    if (!mountedRoot)
+  name: string;
+  slug: string;
+
+  description:
+      | string
+      | null;
+
+  price: number;
+  currency: string;
+
+  imageUrl:
+      | string
+      | null;
+
+  ingredients: string[];
+  allergens: string[];
+
+  badge:
+      | string
+      | null;
+
+  ratingAverage: number;
+  reviewCount: number;
+
+  isAvailable: boolean;
+
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+
+  restaurant: {
+    id: number;
+
+    name: string;
+    slug: string;
+
+    address: string;
+    city: string;
+
+    logoUrl:
+        | string
+        | null;
+
+    deliveryMinMinutes: number;
+    deliveryMaxMinutes: number;
+
+    deliveryFee: number;
+    minimumOrder: number;
+
+    isAcceptingOrders: boolean;
+  };
+};
+
+type Props = {
+  product: ProductData;
+
+  relatedProducts?:
+      ProductData[];
+};
+
+function money(
+    value: number
+) {
+  return value.toLocaleString(
+      "en-US"
+  );
+}
+
+export default function Product({
+                                  product,
+                                  relatedProducts = [],
+                                }: Props) {
+  /*
+   * =====================================
+   * CART
+   * =====================================
+   */
+
+  const items =
+      useCartStore(
+          (state) =>
+              state.items
+      );
+
+  const addItem =
+      useCartStore(
+          (state) =>
+              state.addItem
+      );
+
+  const clearCart =
+      useCartStore(
+          (state) =>
+              state.clearCart
+      );
+
+  const hasHydrated =
+      useCartStore(
+          (state) =>
+              state.hasHydrated
+      );
+
+  /*
+   * =====================================
+   * QUANTITY
+   * =====================================
+   */
+
+  const [
+    quantity,
+    setQuantity,
+  ] = useState(1);
+
+  const [
+    added,
+    setAdded,
+  ] = useState(false);
+
+  /*
+   * =====================================
+   * CART TOTAL
+   * =====================================
+   */
+
+  const cartTotal =
+      useMemo(
+          () =>
+              items.reduce(
+                  (
+                      total,
+                      item
+                  ) =>
+                      total +
+                      item.price *
+                      item.quantity,
+                  0
+              ),
+          [
+            items,
+          ]
+      );
+
+  const lineTotal =
+      product.price *
+      quantity;
+
+  /*
+   * =====================================
+   * AVAILABILITY
+   * =====================================
+   */
+
+  const canOrder =
+      product.isAvailable &&
+      product.restaurant
+          .isAcceptingOrders;
+
+  /*
+   * =====================================
+   * ADD PRODUCT
+   * =====================================
+   */
+
+  function addToBasket() {
+    if (!canOrder) {
       return;
-    const root = mountedRoot;
-    const effects = createEffects();
-    // ===== Demo dishes =====
-    const PRODUCTS = [
-      {
-        id: "p1", title: "Margherita", category: "Pizza", time: "25–35 min", rating: 4.7, votes: 98, price: 2400,
-        desc: "The classic: fior di latte, San Marzano tomato and basil picked the same morning. Light, fast, and the single most ordered dish on Foodly.",
-        img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id: "p2", title: "Pepperoni", category: "Pizza", time: "25–35 min", rating: 4.5, votes: 76, price: 2900,
-        desc: "Spicy pepperoni, mozzarella and a slow-cooked tomato base. A louder, richer take on the classic.",
-        img: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id: "p3", title: "Carbonara", category: "Pasta", time: "30–40 min", rating: 4.6, votes: 64, price: 2600,
-        desc: "Guanciale, egg yolk, pecorino romano and cracked black pepper. No cream — the sauce is emulsified to order.",
-        img: "https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=1200&auto=format&fit=crop"
-      },
-      {
-        id: "p4", title: "Caesar salad", category: "Salads", time: "20–30 min", rating: 4.3, votes: 52, price: 1900,
-        desc: "Grilled chicken, romaine, sourdough croutons and a proper anchovy caesar dressing. The light option that still fills you up.",
-        img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop"
-      },
-    ];
-    // ===== Basket (localStorage) =====
-    const LS_KEY = "food_cart_v1";
-    const $cartList = requireElement(root, "#cartList", HTMLElement);
-    const $cartTotal = requireElement(root, "#cartTotal", HTMLElement);
-    const $clearCartBtn = requireElement(root, "#clearCartBtn", HTMLButtonElement);
-    function readCart() { return readStorage(LS_KEY, []); }
-    function writeCart(items: CartItem[]) { writeStorage(LS_KEY, items); }
-    function money(n: number) { return (n ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-    function starsFromRating(r: number) {
-      const full = (r >= 4.5) ? 5 : (r >= 4.0 ? 4 : 3);
-      return "★★★★★".slice(0, full) + "☆☆☆☆☆".slice(0, 5 - full);
     }
-    function renderCart() {
-      const cart = readCart();
-      const total = cart.reduce((s, i) => s + i.qty * i.price, 0);
-      $cartTotal.textContent = money(total) + "֏";
-      if (cart.length === 0) {
-        $cartList.innerHTML = `
-              <div class="empty-state">
-                <div class="ico">🛍️</div>
-                <p class="mb-0">Your basket is empty.</p>
-              </div>`;
-        return;
-      }
-      $cartList.innerHTML = cart.map(i => `
-            <div class="cart-item">
-              <div class="d-flex justify-content-between align-items-start gap-2">
-                <div>
-                  <p class="t">${i.title}</p>
-                  <div class="muted" style="font-size:.85rem">${money(i.price)}֏ × ${i.qty} = <b>${money(i.price * i.qty)}֏</b></div>
-                </div>
-                <div class="qty">
-                  <button type="button" data-dec="${i.id}" aria-label="Remove one">−</button>
-                  <span>${i.qty}</span>
-                  <button type="button" data-inc="${i.id}" aria-label="Add one">+</button>
-                </div>
-              </div>
-            </div>
-          `).join("");
+
+    /*
+     * Your current addItem() API adds
+     * one item at a time.
+     *
+     * Calling it quantity times means
+     * selecting 3 adds quantity 3.
+     */
+
+    for (
+        let index = 0;
+        index < quantity;
+        index++
+    ) {
+      addItem({
+        id:
+        product.id,
+
+        slug:
+        product.slug,
+
+        name:
+        product.name,
+
+        price:
+        product.price,
+
+        imageUrl:
+        product.imageUrl,
+
+        restaurantId:
+        product.restaurant.id,
+
+        restaurantName:
+        product.restaurant.name,
+      });
     }
-    function changeQty(productId: string, delta: number) {
-      const cart = readCart();
-      const item = cart.find(i => i.id === productId);
-      if (!item)
-        return;
-      item.qty += delta;
-      writeCart(cart.filter(i => i.qty > 0));
-      renderCart();
-    }
-    function clearCart() { writeCart([]); renderCart(); }
-    effects.listen(root, "click", (e) => {
-      const incId = (e.target instanceof Element ? e.target.closest<HTMLElement>("[data-add], [data-inc], [data-dec]") : null)?.dataset?.inc;
-      const decId = (e.target instanceof Element ? e.target.closest<HTMLElement>("[data-add], [data-inc], [data-dec]") : null)?.dataset?.dec;
-      if (incId)
-        changeQty(incId, +1);
-      if (decId)
-        changeQty(decId, -1);
-    });
-    effects.listen($clearCartBtn, "click", clearCart);
-    // ===== Dish details =====
-    const $img = requireElement(root, "#prodImg", HTMLImageElement);
-    const $title = requireElement(root, "#prodTitle", HTMLElement);
-    const $crumb = requireElement(root, "#prodCrumb", HTMLElement);
-    const $cat = requireElement(root, "#prodCategory", HTMLElement);
-    const $time = requireElement(root, "#prodTime", HTMLElement);
-    const $stars = requireElement(root, "#prodStars", HTMLElement);
-    const $ratingText = requireElement(root, "#prodRatingText", HTMLElement);
-    const $price = requireElement(root, "#prodPrice", HTMLElement);
-    const $desc = requireElement(root, "#prodDesc", HTMLElement);
-    const $qtyVal = requireElement(root, "#qtyVal", HTMLElement);
-    const $lineTotal = requireElement(root, "#lineTotal", HTMLElement);
-    const $incBtn = requireElement(root, "#incBtn", HTMLButtonElement);
-    const $decBtn = requireElement(root, "#decBtn", HTMLButtonElement);
-    const $addBtn = requireElement(root, "#addBtn", HTMLButtonElement);
-    function getProductIdFromUrl() {
-      const params = new URLSearchParams(location.search);
-      return params.get("id") || "p1";
-    }
-    let selected = PRODUCTS[0];
-    let qty = 1;
-    function renderProduct() {
-      const id = getProductIdFromUrl();
-      selected = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
-      document.title = selected.title + " — Foodly";
-      $img.src = selected.img;
-      $img.alt = selected.title;
-      $title.textContent = selected.title;
-      $crumb.textContent = selected.title;
-      $cat.textContent = selected.category;
-      $time.textContent = selected.time;
-      $stars.textContent = starsFromRating(selected.rating);
-      $ratingText.textContent = `${selected.rating.toFixed(1)} · ${selected.votes} reviews`;
-      $price.textContent = money(selected.price) + "֏";
-      $desc.textContent = selected.desc;
-      qty = 1;
-      $qtyVal.textContent = String(qty);
-      $lineTotal.textContent = money(selected.price * qty) + "֏";
-      renderRelated();
-    }
-    function setQty(next: number) {
-      qty = Math.max(1, next);
-      $qtyVal.textContent = String(qty);
-      $lineTotal.textContent = money(selected.price * qty) + "֏";
-    }
-    effects.listen($incBtn, "click", () => setQty(qty + 1));
-    effects.listen($decBtn, "click", () => setQty(qty - 1));
-    function addToCart(product: (typeof PRODUCTS)[number], qtyToAdd: number) {
-      const cart = readCart();
-      const found = cart.find(i => i.id === product.id);
-      if (found)
-        found.qty += qtyToAdd;
-      else
-        cart.push({ id: product.id, title: product.title, price: product.price, qty: qtyToAdd });
-      writeCart(cart);
-      renderCart();
-    }
-    effects.listen($addBtn, "click", () => {
-      if (!selected)
-        return;
-      addToCart(selected, qty);
-    });
-    // ===== Related =====
-    const $related = requireElement(root, "#relatedGrid", HTMLElement);
-    function renderRelated() {
-      const list = PRODUCTS.filter(p => p.id !== selected.id).slice(0, 3);
-      $related.innerHTML = list.map(p => `
-            <div class="col-12 col-md-6 col-xl-4">
-              <a class="tile h-100" href="?id=${encodeURIComponent(p.id)}" style="text-decoration:none">
-                <div class="tile-media" style="aspect-ratio:16/10">
-                  <img alt="${p.title}" src="${p.img}">
-                </div>
-                <div class="tile-body">
-                  <h3 class="tile-title">${p.title}</h3>
-                  <p class="tile-meta">${p.category} · ${p.time}</p>
-                  <div class="d-flex justify-content-between align-items-center mt-auto">
-                    <span class="stars">${starsFromRating(p.rating)}</span>
-                    <span class="price">${money(p.price)}֏</span>
-                  </div>
-                </div>
-              </a>
-            </div>
-          `).join("");
-    }
-    // init
-    renderProduct();
-    renderCart();
-    return effects.cleanup;
-  }, []);
+
+    setAdded(
+        true
+    );
+
+    window.setTimeout(
+        () => {
+          setAdded(
+              false
+          );
+        },
+        1200
+    );
+  }
+
+  /*
+   * =====================================
+   * IMAGE
+   * =====================================
+   */
+
+  const productImage =
+      product.imageUrl ||
+      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1200&auto=format&fit=crop";
 
   return (
-    <div ref={rootRef}>
-      <style>{pageStyles}</style>
-      <section className="section">
-        <div className="container">
-          <nav className="breadcrumbs" aria-label="Breadcrumb">
-            <Link href="/">Home</Link>
-            <span>/</span>
-            <Link href="/products">Menu</Link>
-            <span>/</span>
-            <span id="prodCrumb">Dish</span>
-          </nav>
-          <div className="row g-4 g-xl-5">
-            <div className="col-12 col-lg-7">
-              <div className="gallery-main"><img id="prodImg" alt="Dish" /></div>
-              <div className="row g-3 mt-1">
-                <div className="col-4">
-                  <div className="stat-mini text-center">
-                    <div className="k">Kitchen</div>
-                    <div className="v" style={{ "fontSize": "1.05rem" }}>La Pasta</div>
-                  </div>
+      <main>
+
+        <style>
+          {pageStyles}
+        </style>
+
+        {/* =================================
+          PRODUCT
+      ================================= */}
+
+        <section className="section">
+
+          <div className="container">
+
+            {/* BREADCRUMBS */}
+
+            <nav
+                className="breadcrumbs"
+                aria-label="Breadcrumb"
+            >
+
+              <Link href="/">
+                Home
+              </Link>
+
+              <span>
+              /
+            </span>
+
+              <Link href="/products">
+                Menu
+              </Link>
+
+              <span>
+              /
+            </span>
+
+              <span>
+              {
+                product.name
+              }
+            </span>
+
+            </nav>
+
+            <div className="row g-4 g-xl-5">
+
+              {/* ============================
+                LEFT
+            ============================ */}
+
+              <div className="col-12 col-lg-7">
+
+                {/* IMAGE */}
+
+                <div className="gallery-main">
+
+                  <img
+                      className="product-main-image"
+                      src={
+                        productImage
+                      }
+                      alt={
+                        product.name
+                      }
+                  />
+
                 </div>
-                <div className="col-4">
-                  <div className="stat-mini text-center">
-                    <div className="k">Portion</div>
-                    <div className="v" style={{ "fontSize": "1.05rem" }}>450 g</div>
+
+                {/* INFO */}
+
+                <div className="row g-3 mt-1">
+
+                  {/* KITCHEN */}
+
+                  <div className="col-4">
+
+                    <div className="stat-mini text-center">
+
+                      <div className="k">
+                        Kitchen
+                      </div>
+
+                      <div
+                          className="v"
+                          style={{
+                            fontSize:
+                                "1.05rem",
+                          }}
+                      >
+                        {
+                          product
+                              .restaurant
+                              .name
+                        }
+                      </div>
+
+                    </div>
+
                   </div>
-                </div>
-                <div className="col-4">
-                  <div className="stat-mini text-center">
-                    <div className="k">Energy</div>
-                    <div className="v" style={{ "fontSize": "1.05rem" }}>680 kcal</div>
+
+                  {/* DELIVERY */}
+
+                  <div className="col-4">
+
+                    <div className="stat-mini text-center">
+
+                      <div className="k">
+                        Delivery
+                      </div>
+
+                      <div
+                          className="v"
+                          style={{
+                            fontSize:
+                                "1.05rem",
+                          }}
+                      >
+                        {
+                          product
+                              .restaurant
+                              .deliveryMinMinutes
+                        }
+                        –
+                        {
+                          product
+                              .restaurant
+                              .deliveryMaxMinutes
+                        }{" "}
+                        min
+                      </div>
+
+                    </div>
+
                   </div>
-                </div>
-              </div>
-              <div className="panel mt-4">
-                <div className="panel-head">What&apos;s in it</div>
-                <div className="panel-body">
-                  <p id="prodDesc" className="mb-3"></p>
-                  <div className="d-flex flex-wrap gap-2">
-                    <span className="badge-soft">Freshly made</span>
-                    <span className="badge-soft">Contains gluten</span>
-                    <span className="badge-soft">Contains dairy</span>
-                    <span className="badge-soft is-green">Halal kitchen</span>
+
+                  {/* REVIEWS */}
+
+                  <div className="col-4">
+
+                    <div className="stat-mini text-center">
+
+                      <div className="k">
+                        Reviews
+                      </div>
+
+                      <div
+                          className="v"
+                          style={{
+                            fontSize:
+                                "1.05rem",
+                          }}
+                      >
+                        {
+                          product.reviewCount
+                        }
+                      </div>
+
+                    </div>
+
                   </div>
+
                 </div>
-              </div>
-            </div>
-            <div className="col-12 col-lg-5">
-              <div className="buy-sticky">
-                <div className="panel">
+
+                {/* DESCRIPTION */}
+
+                <div className="panel mt-4">
+
+                  <div className="panel-head">
+                    About this dish
+                  </div>
+
                   <div className="panel-body">
-                    <div className="d-flex gap-2 mb-3">
-                      <span className="badge-soft is-brand" id="prodCategory">Category</span>
-                      <span className="badge-soft" id="prodTime">25–35 min</span>
-                    </div>
-                    <h1 className="display-md mb-2" id="prodTitle">Dish</h1>
-                    <div className="d-flex align-items-center gap-2 mb-4">
-                      <span className="stars" id="prodStars">★★★★★</span>
-                      <span className="muted" style={{ "fontSize": ".88rem" }} id="prodRatingText">—</span>
-                    </div>
-                    <div className="price-xl mb-1" id="prodPrice">0֏</div>
-                    <p className="muted" style={{ "fontSize": ".88rem" }}>Price includes VAT. Delivery calculated at checkout.</p>
-                    <hr />
-                    <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
-                      <div className="qty">
-                        <button type="button" id="decBtn" aria-label="Decrease quantity">−</button>
-                        <span id="qtyVal">1</span>
-                        <button type="button" id="incBtn" aria-label="Increase quantity">+</button>
-                      </div>
-                      <div className="text-end">
-                        <div className="muted" style={{ "fontSize": ".82rem" }}>Line total</div>
-                        <div className="money" style={{ "fontSize": "1.35rem" }} id="lineTotal">0֏</div>
-                      </div>
-                    </div>
-                    <div className="d-grid gap-2">
-                      <button className="btn btn-brand btn-lg" id="addBtn">Add to basket</button>
-                      <Link className="btn btn-line" href="/checkout">Go to checkout</Link>
-                    </div>
+
+                    <p className="product-description mb-4">
+
+                      {
+                          product.description ||
+                          "No description available."
+                      }
+
+                    </p>
+
+                    {/* INGREDIENTS */}
+
+                    {product.ingredients
+                            .length >
+                        0 && (
+                            <>
+
+                              <h3 className="h6 mb-3">
+                                Ingredients
+                              </h3>
+
+                              <div className="d-flex flex-wrap gap-2 mb-4">
+
+                                {product.ingredients.map(
+                                    (
+                                        ingredient
+                                    ) => (
+
+                                        <span
+                                            key={
+                                              ingredient
+                                            }
+                                            className="badge-soft"
+                                        >
+                              {
+                                ingredient
+                              }
+                            </span>
+
+                                    )
+                                )}
+
+                              </div>
+
+                            </>
+                        )}
+
+                    {/* ALLERGENS */}
+
+                    {product.allergens
+                            .length >
+                        0 && (
+                            <>
+
+                              <h3 className="h6 mb-3">
+                                Allergens
+                              </h3>
+
+                              <div className="d-flex flex-wrap gap-2">
+
+                                {product.allergens.map(
+                                    (
+                                        allergen
+                                    ) => (
+
+                                        <span
+                                            key={
+                                              allergen
+                                            }
+                                            className="badge-soft"
+                                        >
+                              {
+                                allergen
+                              }
+                            </span>
+
+                                    )
+                                )}
+
+                              </div>
+
+                            </>
+                        )}
+
                   </div>
-                  <div className="panel-foot">
+
+                </div>
+
+                {/* RESTAURANT */}
+
+                <div className="panel mt-4">
+
+                  <div className="panel-head">
+                    Restaurant
+                  </div>
+
+                  <div className="panel-body">
+
                     <div className="d-flex align-items-center gap-3">
-                      <span style={{ "width": "40px", "height": "40px", "borderRadius": "12px", "background": "var(--accent-tint)", "color": "var(--accent)", "display": "grid", "placeItems": "center", "flex": "0 0 auto" }}>
-                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M3 7h11v9H3z"></path>
-                          <path d="M14 10h3.5L21 13v3h-7z"></path>
-                          <circle cx="7" cy="18" r="1.8"></circle>
-                          <circle cx="17.5" cy="18" r="1.8"></circle>
+
+                      {product.restaurant
+                          .logoUrl && (
+
+                          <img
+                              src={
+                                product
+                                    .restaurant
+                                    .logoUrl
+                              }
+                              alt={
+                                product
+                                    .restaurant
+                                    .name
+                              }
+                              style={{
+                                width:
+                                    "60px",
+
+                                height:
+                                    "60px",
+
+                                borderRadius:
+                                    "15px",
+
+                                objectFit:
+                                    "cover",
+                              }}
+                          />
+
+                      )}
+
+                      <div>
+
+                        <h3 className="h5 mb-1">
+                          {
+                            product
+                                .restaurant
+                                .name
+                          }
+                        </h3>
+
+                        <p className="muted mb-2">
+                          {
+                            product
+                                .restaurant
+                                .address
+                          }
+                          ,{" "}
+                          {
+                            product
+                                .restaurant
+                                .city
+                          }
+                        </p>
+
+                        <Link
+                            href={`/restaurants/${product.restaurant.slug}`}
+                            className="fw-bold"
+                        >
+                          View restaurant
+                        </Link>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* ============================
+                RIGHT
+            ============================ */}
+
+              <div className="col-12 col-lg-5">
+
+                <div className="buy-sticky">
+
+                  {/* ========================
+                    BUY
+                ======================== */}
+
+                  <div className="panel">
+
+                    <div className="panel-body">
+
+                      {/* BADGES */}
+
+                      <div className="d-flex flex-wrap gap-2 mb-3">
+
+                      <span className="badge-soft is-brand">
+                        {
+                          product
+                              .category
+                              .name
+                        }
+                      </span>
+
+                        <span className="badge-soft">
+                        {
+                          product
+                              .restaurant
+                              .deliveryMinMinutes
+                        }
+                          –
+                          {
+                            product
+                                .restaurant
+                                .deliveryMaxMinutes
+                          }{" "}
+                          min
+                      </span>
+
+                        {product.badge && (
+
+                            <span className="badge-soft is-green">
+                          {
+                            product.badge
+                          }
+                        </span>
+
+                        )}
+
+                      </div>
+
+                      {/* TITLE */}
+
+                      <h1 className="display-md mb-2">
+                        {
+                          product.name
+                        }
+                      </h1>
+
+                      {/* RATING */}
+
+                      <div className="d-flex align-items-center gap-2 mb-4">
+
+                      <span className="stars">
+                        ⭐
+                      </span>
+
+                        <span className="fw-bold">
+                        {product
+                            .ratingAverage
+                            .toFixed(
+                                1
+                            )}
+                      </span>
+
+                        <span
+                            className="muted"
+                            style={{
+                              fontSize:
+                                  ".88rem",
+                            }}
+                        >
+                        {
+                          product.reviewCount
+                        }{" "}
+                          reviews
+                      </span>
+
+                      </div>
+
+                      {/* PRICE */}
+
+                      <div className="price-xl mb-1">
+
+                        {money(
+                            product.price
+                        )}
+                        ֏
+
+                      </div>
+
+                      <p
+                          className="muted"
+                          style={{
+                            fontSize:
+                                ".88rem",
+                          }}
+                      >
+                        Price includes VAT.
+                        Delivery is calculated
+                        at checkout.
+                      </p>
+
+                      <hr />
+
+                      {/* QUANTITY */}
+
+                      <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
+
+                        <div className="qty">
+
+                          <button
+                              type="button"
+                              aria-label="Decrease quantity"
+                              onClick={() =>
+                                  setQuantity(
+                                      (
+                                          current
+                                      ) =>
+                                          Math.max(
+                                              1,
+                                              current -
+                                              1
+                                          )
+                                  )
+                              }
+                          >
+                            −
+                          </button>
+
+                          <span>
+                          {
+                            quantity
+                          }
+                        </span>
+
+                          <button
+                              type="button"
+                              aria-label="Increase quantity"
+                              onClick={() =>
+                                  setQuantity(
+                                      (
+                                          current
+                                      ) =>
+                                          current +
+                                          1
+                                  )
+                              }
+                          >
+                            +
+                          </button>
+
+                        </div>
+
+                        <div className="text-end">
+
+                          <div
+                              className="muted"
+                              style={{
+                                fontSize:
+                                    ".82rem",
+                              }}
+                          >
+                            Line total
+                          </div>
+
+                          <div
+                              className="money"
+                              style={{
+                                fontSize:
+                                    "1.35rem",
+                              }}
+                          >
+                            {money(
+                                lineTotal
+                            )}
+                            ֏
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      {/* ACTIONS */}
+
+                      <div className="d-grid gap-2">
+
+                        <button
+                            className="btn btn-brand btn-lg"
+                            type="button"
+                            disabled={
+                              !canOrder
+                            }
+                            onClick={
+                              addToBasket
+                            }
+                        >
+
+                          {!product
+                              .isAvailable
+                              ? "Unavailable"
+                              : !product
+                                  .restaurant
+                                  .isAcceptingOrders
+                                  ? "Restaurant closed"
+                                  : added
+                                      ? "Added to basket ✓"
+                                      : `Add ${quantity} to basket`}
+
+                        </button>
+
+                        <Link
+                            className="btn btn-line"
+                            href="/checkout"
+                        >
+                          Go to checkout
+                        </Link>
+
+                      </div>
+
+                    </div>
+
+                    {/* DELIVERY INFO */}
+
+                    <div className="panel-foot">
+
+                      <div className="d-flex align-items-center gap-3">
+
+                      <span
+                          style={{
+                            width:
+                                "40px",
+
+                            height:
+                                "40px",
+
+                            borderRadius:
+                                "12px",
+
+                            background:
+                                "var(--accent-tint)",
+
+                            color:
+                                "var(--accent)",
+
+                            display:
+                                "grid",
+
+                            placeItems:
+                                "center",
+
+                            flex:
+                                "0 0 auto",
+                          }}
+                      >
+                        <svg
+                            width="19"
+                            height="19"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.9"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                          <path d="M3 7h11v9H3z" />
+
+                          <path d="M14 10h3.5L21 13v3h-7z" />
+
+                          <circle
+                              cx="7"
+                              cy="18"
+                              r="1.8"
+                          />
+
+                          <circle
+                              cx="17.5"
+                              cy="18"
+                              r="1.8"
+                          />
                         </svg>
                       </span>
-                      <div className="muted" style={{ "fontSize": ".88rem" }}>
-                        Free delivery on baskets over
-                        <b>8,000֏</b>
-                        . Otherwise a flat 500֏.
+
+                        <div
+                            className="muted"
+                            style={{
+                              fontSize:
+                                  ".88rem",
+                            }}
+                        >
+
+                          Delivery fee:{" "}
+
+                          <b>
+                            {product
+                                .restaurant
+                                .deliveryFee ===
+                            0
+                                ? "Free"
+                                : `${money(
+                                    product
+                                        .restaurant
+                                        .deliveryFee
+                                )}֏`}
+                          </b>
+
+                        </div>
+
                       </div>
+
                     </div>
+
                   </div>
-                </div>
-                <div className="panel mt-4">
-                  <div className="panel-head">
-                    Your basket
-                    <button className="btn btn-ghost btn-sm" type="button" id="clearCartBtn">Clear</button>
-                  </div>
-                  <div className="panel-body"><div className="d-grid gap-2" id="cartList"></div></div>
-                  <div className="panel-foot">
-                    <div className="summary-row total">
-                      <span>Total</span>
-                      <span className="money" id="cartTotal">0֏</span>
+
+                  {/* ========================
+                    BASKET
+                ======================== */}
+
+                  <div className="panel mt-4">
+
+                    <div className="panel-head d-flex justify-content-between align-items-center">
+
+                    <span>
+                      Your basket
+                    </span>
+
+                      {items.length >
+                          0 && (
+
+                              <button
+                                  className="btn btn-ghost btn-sm"
+                                  type="button"
+                                  onClick={
+                                    clearCart
+                                  }
+                              >
+                                Clear
+                              </button>
+
+                          )}
+
                     </div>
+
+                    <div className="panel-body">
+
+                      {!hasHydrated ? (
+
+                          <div className="muted">
+                            Loading basket...
+                          </div>
+
+                      ) : items.length ===
+                      0 ? (
+
+                          <div className="empty-state">
+
+                            <div className="ico">
+                              🛍️
+                            </div>
+
+                            <p className="mb-0">
+                              Your basket is empty.
+                            </p>
+
+                          </div>
+
+                      ) : (
+
+                          <div className="d-grid gap-3">
+
+                            {items.map(
+                                (
+                                    item
+                                ) => (
+
+                                    <div
+                                        key={
+                                          item.id
+                                        }
+                                        className="cart-row d-flex justify-content-between gap-3"
+                                    >
+
+                                      <div>
+
+                                        <p className="t mb-1">
+                                          {
+                                            item.name
+                                          }
+                                        </p>
+
+                                        <span className="muted">
+                                  {money(
+                                      item.price
+                                  )}
+                                          ֏ ×{" "}
+                                          {
+                                            item.quantity
+                                          }
+                                </span>
+
+                                      </div>
+
+                                      <div className="money">
+
+                                        {money(
+                                            item.price *
+                                            item.quantity
+                                        )}
+                                        ֏
+
+                                      </div>
+
+                                    </div>
+
+                                )
+                            )}
+
+                          </div>
+
+                      )}
+
+                    </div>
+
+                    <div className="panel-foot">
+
+                      <div className="summary-row total">
+
+                      <span>
+                        Total
+                      </span>
+
+                        <span className="money">
+                        {money(
+                            cartTotal
+                        )}
+                          ֏
+                      </span>
+
+                      </div>
+
+                    </div>
+
                   </div>
+
                 </div>
+
               </div>
+
             </div>
+
           </div>
-        </div>
-      </section>
-      <section className="section section-tint">
-        <div className="container">
-          <div className="section-head">
-            <div>
-              <span className="eyebrow">Goes well with</span>
-              <h2 className="display-md">People also ordered</h2>
-              <p>Based on what other customers added alongside this dish.</p>
-            </div>
-            <Link className="btn btn-line" href="/products">Browse the menu</Link>
-          </div>
-          <div className="row g-4" id="relatedGrid"></div>
-        </div>
-      </section>
-    </div>
+
+        </section>
+
+        {/* =================================
+          RELATED PRODUCTS
+      ================================= */}
+
+        {relatedProducts.length >
+            0 && (
+
+                <section className="section section-tint">
+
+                  <div className="container">
+
+                    <div className="section-head">
+
+                      <div>
+
+                <span className="eyebrow">
+                  Goes well with
+                </span>
+
+                        <h2 className="display-md">
+                          People also ordered
+                        </h2>
+
+                        <p>
+                          More dishes you may
+                          like.
+                        </p>
+
+                      </div>
+
+                      <Link
+                          className="btn btn-line"
+                          href="/products"
+                      >
+                        Browse the menu
+                      </Link>
+
+                    </div>
+
+                    <div className="row g-4">
+
+                      {relatedProducts
+                          .slice(
+                              0,
+                              3
+                          )
+                          .map(
+                              (
+                                  related
+                              ) => (
+
+                                  <div
+                                      key={
+                                        related.id
+                                      }
+                                      className="col-12 col-md-6 col-xl-4"
+                                  >
+
+                                    <Link
+                                        href={`/products/${related.slug}`}
+                                        className="tile h-100"
+                                        style={{
+                                          textDecoration:
+                                              "none",
+                                        }}
+                                    >
+
+                                      <div
+                                          className="tile-media"
+                                          style={{
+                                            aspectRatio:
+                                                "16/10",
+                                          }}
+                                      >
+
+                                        <img
+                                            alt={
+                                              related.name
+                                            }
+                                            src={
+                                                related.imageUrl ||
+                                                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop"
+                                            }
+                                        />
+
+                                      </div>
+
+                                      <div className="tile-body">
+
+                                        <h3 className="tile-title">
+                                          {
+                                            related.name
+                                          }
+                                        </h3>
+
+                                        <p className="tile-meta">
+
+                                          {
+                                            related
+                                                .restaurant
+                                                .name
+                                          }
+
+                                          {" · "}
+
+                                          {
+                                            related
+                                                .restaurant
+                                                .deliveryMinMinutes
+                                          }
+                                          –
+                                          {
+                                            related
+                                                .restaurant
+                                                .deliveryMaxMinutes
+                                          }{" "}
+                                          min
+
+                                        </p>
+
+                                        <div className="d-flex justify-content-between align-items-center mt-auto">
+
+                            <span className="rating">
+                              ⭐{" "}
+                              {related
+                                  .ratingAverage
+                                  .toFixed(
+                                      1
+                                  )}
+                            </span>
+
+                                          <span className="price">
+                              {money(
+                                  related.price
+                              )}
+                                            ֏
+                            </span>
+
+                                        </div>
+
+                                      </div>
+
+                                    </Link>
+
+                                  </div>
+
+                              )
+                          )}
+
+                    </div>
+
+                  </div>
+
+                </section>
+
+            )}
+
+      </main>
   );
 }

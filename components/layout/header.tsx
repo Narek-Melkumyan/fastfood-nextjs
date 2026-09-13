@@ -8,7 +8,7 @@ import {
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useCartStore } from "@/store/cartStore";
 
 /*
@@ -58,6 +58,11 @@ function getDarkMode() {
  */
 
 function Header() {
+    const {
+        user,
+        loading: authLoading,
+    } = useAuth();
+
   const pathname =
       usePathname();
 
@@ -375,12 +380,23 @@ function Header() {
 
               {/* SIGN IN */}
 
-              <Link
-                  className="btn btn-line desktop-only"
-                  href="/login"
-              >
-                Sign in
-              </Link>
+                {!authLoading && (
+                    user ? (
+                        <Link
+                            className="btn btn-line desktop-only"
+                            href="/profile"
+                        >
+                            My profile
+                        </Link>
+                    ) : (
+                        <Link
+                            className="btn btn-line desktop-only"
+                            href="/login"
+                        >
+                            Sign in
+                        </Link>
+                    )
+                )}
 
               {/* ORDER */}
 
@@ -528,15 +544,25 @@ function Header() {
             {/* PROFILE REMOVED */}
 
             <div className="drawer-actions">
-              <Link
-                  className="btn btn-line"
-                  href="/login"
-                  onClick={
-                    closeMenu
-                  }
-              >
-                Sign in
-              </Link>
+                {!authLoading && (
+                    user ? (
+                        <Link
+                            className="btn btn-line"
+                            href="/profile"
+                            onClick={closeMenu}
+                        >
+                            My profile
+                        </Link>
+                    ) : (
+                        <Link
+                            className="btn btn-line"
+                            href="/login"
+                            onClick={closeMenu}
+                        >
+                            Sign in
+                        </Link>
+                    )
+                )}
 
               <Link
                   className="btn btn-brand"
@@ -555,3 +581,4 @@ function Header() {
 }
 
 export default Header;
+

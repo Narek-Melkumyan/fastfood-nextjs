@@ -8,7 +8,14 @@ import {
     type CheckoutItemInput,
 } from "@/lib/checkout";
 
-import { prisma } from "@/lib/prisma";
+import {
+    getBearerToken,
+    verifyAccessToken,
+} from "@/lib/auth";
+
+import {
+    prisma,
+} from "@/lib/prisma";
 
 type OrderBody = {
     customerName?: string;
@@ -34,6 +41,92 @@ export async function POST(
     request: Request
 ) {
     try {
+        /*
+         * =====================================
+         * AUTH - OPTIONAL
+         * =====================================
+         *
+         * Guest:
+         * userId = null
+         *
+         * Logged in:
+         * userId comes ONLY from JWT.
+         */
+
+        let userId:
+            number | null = null;
+
+        const accessToken =
+            getBearerToken(request);
+
+        if (accessToken) {
+            try {
+                const auth =
+                    await verifyAccessToken(
+                        accessToken
+                    );
+
+                /*
+                 * Make sure the user still exists
+                 * and is active.
+                 */
+                const user =
+                    await prisma.user.findUnique({
+                        where: {
+                            id: auth.userId,
+                        },
+
+                        select: {
+                            id: true,
+                            isActive: true,
+                        },
+                    });
+
+                if (
+                    !user ||
+                    !user.isActive
+                ) {
+                    return NextResponse.json(
+                        {
+                            error:
+                                "Your account is not available.",
+                        },
+                        {
+                            status: 401,
+                        }
+                    );
+                }
+
+                userId =
+                    user.id;
+            } catch {
+                /*
+                 * If a Bearer token was sent,
+                 * but it is invalid/expired,
+                 * don't silently treat the request
+                 * as a guest.
+                 *
+                 * AuthProvider apiFetch() can refresh
+                 * the access token and retry.
+                 */
+                return NextResponse.json(
+                    {
+                        error:
+                            "Your session has expired. Please sign in again.",
+                    },
+                    {
+                        status: 401,
+                    }
+                );
+            }
+        }
+
+        /*
+         * =====================================
+         * BODY
+         * =====================================
+         */
+
         const body =
             (await request.json()) as OrderBody;
 
@@ -43,8 +136,35 @@ export async function POST(
         const customerPhone =
             body.customerPhone?.trim();
 
+        const customerEmail =
+            body.customerEmail
+                ?.trim() || null;
+
+        const customerNote =
+            body.customerNote
+                ?.trim() || null;
+
+        const deliveryCity =
+            body.deliveryCity
+                ?.trim() || "Yerevan";
+
+        const deliveryDistrict =
+            body.deliveryDistrict
+                ?.trim() || null;
+
         const deliveryAddress =
             body.deliveryAddress?.trim();
+
+        const deliveryTime =
+            body.deliveryTime
+                ?.trim() ||
+            "As soon as possible";
+
+        /*
+         * =====================================
+         * VALIDATION
+         * =====================================
+         */
 
         if (!customerName) {
             throw new CheckoutError(
@@ -64,10 +184,20 @@ export async function POST(
             );
         }
 
+        if (
+            !body.items ||
+            body.items.length === 0
+        ) {
+            throw new CheckoutError(
+                "Your basket is empty."
+            );
+        }
+
         /*
-         * Card processing will later be
-         * handled by Stripe.
+         * Card processing will later
+         * be handled by Stripe.
          */
+
         if (
             body.paymentMethod ===
             "CARD"
@@ -77,18 +207,31 @@ export async function POST(
             );
         }
 
+        /*
+         * =====================================
+         * CALCULATE ORDER
+         * =====================================
+         */
+
         const quote =
             await calculateCheckout(
-                body.items || [],
+                body.items,
                 body.promoCode,
                 {
                     phone:
                     customerPhone,
 
                     email:
-                    body.customerEmail,
+                        customerEmail ??
+                        undefined,
                 }
             );
+
+        /*
+         * =====================================
+         * ORDER NUMBER
+         * =====================================
+         */
 
         const orderNumber =
             `FD-${Date.now()
@@ -98,12 +241,29 @@ export async function POST(
                 .slice(0, 5)
                 .toUpperCase()}`;
 
+        /*
+         * =====================================
+         * DATABASE TRANSACTION
+         * =====================================
+         */
+
         const order =
             await prisma.$transaction(
                 async (tx) => {
                     const createdOrder =
                         await tx.order.create({
                             data: {
+                                /*
+                                 * IMPORTANT:
+                                 *
+                                 * Logged-in user:
+                                 * userId = JWT user id
+                                 *
+                                 * Guest:
+                                 * userId = null
+                                 */
+                                userId,
+
                                 orderNumber,
 
                                 paymentMethod:
@@ -112,36 +272,33 @@ export async function POST(
                                 paymentStatus:
                                     "PENDING",
 
+                                /*
+                                 * Customer information
+                                 */
+
                                 customerName,
 
                                 customerPhone,
 
-                                customerEmail:
-                                    body.customerEmail
-                                        ?.trim() ||
-                                    null,
+                                customerEmail,
 
-                                customerNote:
-                                    body.customerNote
-                                        ?.trim() ||
-                                    null,
+                                customerNote,
 
-                                deliveryCity:
-                                    body.deliveryCity
-                                        ?.trim() ||
-                                    "Yerevan",
+                                /*
+                                 * Delivery
+                                 */
 
-                                deliveryDistrict:
-                                    body.deliveryDistrict
-                                        ?.trim() ||
-                                    null,
+                                deliveryCity,
+
+                                deliveryDistrict,
 
                                 deliveryAddress,
 
-                                deliveryTime:
-                                    body.deliveryTime
-                                        ?.trim() ||
-                                    "As soon as possible",
+                                deliveryTime,
+
+                                /*
+                                 * Prices
+                                 */
 
                                 subtotal:
                                 quote.subtotal,
@@ -161,10 +318,18 @@ export async function POST(
                                 currency:
                                     "AMD",
 
+                                /*
+                                 * Promotion
+                                 */
+
                                 promotionId:
                                     quote.promotion
-                                        ?.id ||
+                                        ?.id ??
                                     null,
+
+                                /*
+                                 * Order items
+                                 */
 
                                 items: {
                                     create:
@@ -174,44 +339,98 @@ export async function POST(
 
                             select: {
                                 id: true,
+
+                                userId: true,
+
                                 orderNumber: true,
+
                                 status: true,
 
+                                paymentMethod: true,
+
+                                paymentStatus: true,
+
                                 subtotal: true,
+
                                 deliveryFee: true,
+
                                 discount: true,
+
                                 total: true,
 
+                                currency: true,
+
                                 createdAt: true,
+
+                                items: {
+                                    select: {
+                                        id: true,
+
+                                        productName:
+                                            true,
+
+                                        restaurantName:
+                                            true,
+
+                                        quantity:
+                                            true,
+
+                                        unitPrice:
+                                            true,
+
+                                        lineTotal:
+                                            true,
+                                    },
+                                },
                             },
                         });
 
                     /*
-                     * Record promo usage
+                     * =================================
+                     * PROMOTION REDEMPTION
+                     * =================================
                      */
+
                     if (
                         quote.promotion
                     ) {
-                        await tx.promotionRedemption.create(
-                            {
+                        await tx
+                            .promotionRedemption
+                            .create({
                                 data: {
                                     promotionId:
-                                    quote.promotion
+                                    quote
+                                        .promotion
                                         .id,
 
                                     orderId:
                                     createdOrder.id,
 
+                                    /*
+                                     * Logged-in account
+                                     * gets associated with
+                                     * promo redemption.
+                                     *
+                                     * Guest = null
+                                     */
+                                    userId,
+
                                     discountAmount:
-                                    quote.promotionSavings,
+                                    quote
+                                        .promotionSavings,
                                 },
-                            }
-                        );
+                            });
                     }
 
                     return createdOrder;
                 }
             );
+
+        /*
+         * =====================================
+         * RESPONSE
+         * =====================================
+         */
 
         return NextResponse.json(
             {
@@ -224,6 +443,12 @@ export async function POST(
             }
         );
     } catch (error) {
+        /*
+         * =====================================
+         * CHECKOUT ERRORS
+         * =====================================
+         */
+
         if (
             error instanceof
             CheckoutError
@@ -240,6 +465,12 @@ export async function POST(
             );
         }
 
+        /*
+         * =====================================
+         * UNKNOWN ERROR
+         * =====================================
+         */
+
         console.error(
             "CREATE ORDER ERROR:",
             error
@@ -248,7 +479,7 @@ export async function POST(
         return NextResponse.json(
             {
                 error:
-                    "Could not place your order."
+                    "Could not place your order.",
             },
             {
                 status: 500,
