@@ -45,6 +45,16 @@ export default function ProfilePage() {
     const [loggingOut, setLoggingOut] =
         useState(false);
 
+
+    const [sendingVerification, setSendingVerification] =
+        useState(false);
+
+    const [verificationMessage, setVerificationMessage] =
+        useState("");
+
+    const [verificationError, setVerificationError] =
+        useState("");
+
     useEffect(() => {
         if (authLoading) {
             return;
@@ -111,6 +121,41 @@ export default function ProfilePage() {
             router.replace("/login");
         } finally {
             setLoggingOut(false);
+        }
+    }
+
+    async function handleSendVerification() {
+        try {
+            setSendingVerification(true);
+            setVerificationMessage("");
+            setVerificationError("");
+
+            const response = await apiFetch(
+                "/api/auth/email-verification/send",
+                {
+                    method: "POST",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || "Could not send verification email."
+                );
+            }
+
+            setVerificationMessage(
+                data.message || "Verification email sent."
+            );
+        } catch (error) {
+            setVerificationError(
+                error instanceof Error
+                    ? error.message
+                    : "Could not send verification email."
+            );
+        } finally {
+            setSendingVerification(false);
         }
     }
 
@@ -341,12 +386,45 @@ export default function ProfilePage() {
 
                                         {profile.emailVerifiedAt ? (
                                             <span className="badge text-bg-success">
-                        Verified
-                      </span>
+    Verified
+  </span>
                                         ) : (
-                                            <span className="badge text-bg-warning">
-                        Not verified
-                      </span>
+                                            <div>
+                                                <div className="d-flex align-items-center gap-2 flex-wrap">
+      <span className="badge text-bg-warning">
+        Not verified
+      </span>
+
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-line btn-sm"
+                                                        disabled={sendingVerification}
+                                                        onClick={handleSendVerification}
+                                                    >
+                                                        {sendingVerification
+                                                            ? "Sending..."
+                                                            : "Verify email"}
+                                                    </button>
+                                                </div>
+
+                                                {verificationMessage && (
+                                                    <div
+                                                        className="text-success mt-2"
+                                                        style={{ fontSize: ".85rem" }}
+                                                    >
+                                                        {verificationMessage}
+                                                    </div>
+                                                )}
+
+                                                {verificationError && (
+                                                    <div
+                                                        className="text-danger mt-2"
+                                                        style={{ fontSize: ".85rem" }}
+                                                    >
+                                                        {verificationError}
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
 

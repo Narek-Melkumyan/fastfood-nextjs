@@ -5,6 +5,7 @@ import {
     useState,
 } from "react";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import {
@@ -42,18 +43,63 @@ function getPrice(
     if (
         typeof value === "number"
     ) {
-        return new Intl.NumberFormat(
-            "en-US",
-            {
-                style: "currency",
-                currency: "USD",
-            }
-        ).format(value);
+        return `${value.toLocaleString("en-US")}֏`;
     }
 
-    return value
-        ? `$${String(value)}`
-        : "—";
+    if (value) {
+        const number = Number(value);
+
+        if (!Number.isNaN(number)) {
+            return `${number.toLocaleString("en-US")}֏`;
+        }
+    }
+
+    return "—";
+}
+
+function readableStatus(
+    status: string
+) {
+    return status
+        .split("_")
+        .map(
+            (part) =>
+                part.charAt(0) +
+                part
+                    .slice(1)
+                    .toLowerCase()
+        )
+        .join(" ");
+}
+
+function statusClass(
+    status: string
+) {
+    switch (status) {
+        case "DELIVERED":
+            return "text-bg-success";
+
+        case "PREPARING":
+            return "text-bg-info";
+
+        case "CONFIRMED":
+            return "text-bg-primary";
+
+        case "OUT_FOR_DELIVERY":
+            return "text-bg-primary";
+
+        case "PENDING":
+            return "text-bg-warning";
+
+        case "CANCELLED":
+            return "text-bg-danger";
+
+        case "REFUNDED":
+            return "text-bg-secondary";
+
+        default:
+            return "text-bg-dark";
+    }
 }
 
 export default function OrdersPage() {
@@ -90,41 +136,55 @@ export default function OrdersPage() {
             return;
         }
 
+        let ignore = false;
+
         async function loadOrders() {
             try {
                 setLoading(true);
+                setError("");
 
                 const response =
                     await apiFetch(
                         "/api/profile/orders"
                     );
 
+                const data =
+                    await response.json();
+
                 if (!response.ok) {
                     throw new Error(
+                        data.error ||
                         "Unable to load orders."
                     );
                 }
 
-                const data =
-                    await response.json();
-
-                setOrders(
-                    Array.isArray(data.orders)
-                        ? data.orders
-                        : []
-                );
+                if (!ignore) {
+                    setOrders(
+                        Array.isArray(data.orders)
+                            ? data.orders
+                            : []
+                    );
+                }
             } catch (error) {
-                setError(
-                    error instanceof Error
-                        ? error.message
-                        : "Unable to load orders."
-                );
+                if (!ignore) {
+                    setError(
+                        error instanceof Error
+                            ? error.message
+                            : "Unable to load orders."
+                    );
+                }
             } finally {
-                setLoading(false);
+                if (!ignore) {
+                    setLoading(false);
+                }
             }
         }
 
         loadOrders();
+
+        return () => {
+            ignore = true;
+        };
     }, [
         authLoading,
         user,
@@ -150,7 +210,6 @@ export default function OrdersPage() {
     return (
         <main className="py-5">
             <div className="container">
-
         <span className="eyebrow">
           My account
         </span>
@@ -180,7 +239,6 @@ export default function OrdersPage() {
                             }}
                         >
                             <div className="card-body p-5 text-center">
-
                                 <h2 className="h4">
                                     No orders yet
                                 </h2>
@@ -188,7 +246,6 @@ export default function OrdersPage() {
                                 <p className="muted mb-0">
                                     Your orders will appear here.
                                 </p>
-
                             </div>
                         </div>
                     )}
@@ -231,22 +288,29 @@ export default function OrdersPage() {
                                     <div
                                         className="card border-0 shadow-sm"
                                         style={{
-                                            borderRadius:
-                                                "20px",
+                                            borderRadius: "20px",
                                         }}
                                     >
                                         <div className="card-body p-4">
-
-                                            <div className="d-flex justify-content-between gap-3">
-
+                                            <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                                                 <div>
                                                     <div className="muted small">
                                                         ORDER
                                                     </div>
 
-                                                    <h2 className="h5 mb-1">
-                                                        {number}
-                                                    </h2>
+                                                    <Link
+                                                        href={`/profile/orders/${id}`}
+                                                        className="text-decoration-none"
+                                                    >
+                                                        <h2
+                                                            className="h5 mb-1"
+                                                            style={{
+                                                                color: "var(--brand)",
+                                                            }}
+                                                        >
+                                                            {number}
+                                                        </h2>
+                                                    </Link>
 
                                                     {createdAt && (
                                                         <div className="muted">
@@ -257,22 +321,33 @@ export default function OrdersPage() {
                                                     )}
                                                 </div>
 
-                                                <div className="text-end">
+                                                <div className="d-flex align-items-center gap-4">
+                                                    <div className="text-end">
+                            <span
+                                className={`badge ${statusClass(
+                                    status
+                                )}`}
+                            >
+                              {readableStatus(
+                                  status
+                              )}
+                            </span>
 
-                          <span className="badge text-bg-dark">
-                            {status}
-                          </span>
-
-                                                    <div className="fw-bold mt-2">
-                                                        {getPrice(
-                                                            order
-                                                        )}
+                                                        <div className="fw-bold mt-2">
+                                                            {getPrice(
+                                                                order
+                                                            )}
+                                                        </div>
                                                     </div>
 
+                                                    <Link
+                                                        href={`/profile/orders/${id}`}
+                                                        className="btn btn-line btn-sm"
+                                                    >
+                                                        View details
+                                                    </Link>
                                                 </div>
-
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
@@ -280,7 +355,6 @@ export default function OrdersPage() {
                         }
                     )}
                 </div>
-
             </div>
         </main>
     );

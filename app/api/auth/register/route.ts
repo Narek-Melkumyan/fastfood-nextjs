@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { sendEmailVerification } from "@/lib/emailVerification";
 
 import {
     createAccessToken,
@@ -92,7 +93,6 @@ export async function POST(request: NextRequest) {
                 where: {
                     email,
                 },
-
                 select: {
                     id: true,
                 },
@@ -137,15 +137,12 @@ export async function POST(request: NextRequest) {
                             data: {
                                 name,
                                 email,
-
                                 phone:
                                     phone.length > 0
                                         ? phone
                                         : null,
-
                                 passwordHash,
                             },
-
                             select: {
                                 id: true,
                                 name: true,
@@ -162,15 +159,11 @@ export async function POST(request: NextRequest) {
                                 hashRefreshToken(
                                     refreshToken
                                 ),
-
-                            userId: newUser.id,
-
+                            userId:
+                            newUser.id,
                             expiresAt,
-
                             remember,
-
                             userAgent,
-
                             ipAddress,
                         },
                     });
@@ -178,6 +171,16 @@ export async function POST(request: NextRequest) {
                     return newUser;
                 }
             );
+
+        await sendEmailVerification({
+            id: user.id,
+            email: user.email,
+        }).catch((error) => {
+            console.error(
+                "REGISTER VERIFICATION EMAIL ERROR:",
+                error
+            );
+        });
 
         const accessToken =
             await createAccessToken({
@@ -209,7 +212,6 @@ export async function POST(request: NextRequest) {
             "REGISTER ERROR:",
             error
         );
-
 
         if (
             typeof error === "object" &&

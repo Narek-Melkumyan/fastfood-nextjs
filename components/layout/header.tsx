@@ -1,15 +1,21 @@
 "use client";
 
 import {
-  useEffect,
-  useState,
-  useSyncExternalStore,
+    useEffect,
+    useState,
+    useSyncExternalStore,
 } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/app/providers/AuthProvider";
-import { useCartStore } from "@/store/cartStore";
+
+import {
+    useAuth,
+} from "@/app/providers/AuthProvider";
+
+import {
+    useCartStore,
+} from "@/store/cartStore";
 
 /*
  * =========================================
@@ -20,35 +26,35 @@ import { useCartStore } from "@/store/cartStore";
 function subscribeToTheme(
     onChange: () => void
 ) {
-  window.addEventListener(
-      "storage",
-      onChange
-  );
-
-  window.addEventListener(
-      "foodly-storage",
-      onChange
-  );
-
-  return () => {
-    window.removeEventListener(
+    window.addEventListener(
         "storage",
         onChange
     );
 
-    window.removeEventListener(
+    window.addEventListener(
         "foodly-storage",
         onChange
     );
-  };
+
+    return () => {
+        window.removeEventListener(
+            "storage",
+            onChange
+        );
+
+        window.removeEventListener(
+            "foodly-storage",
+            onChange
+        );
+    };
 }
 
 function getDarkMode() {
-  return (
-      localStorage.getItem(
-          "theme"
-      ) === "dark"
-  );
+    return (
+        localStorage.getItem(
+            "theme"
+        ) === "dark"
+    );
 }
 
 /*
@@ -58,152 +64,195 @@ function getDarkMode() {
  */
 
 function Header() {
+    /*
+     * =========================================
+     * AUTH
+     * =========================================
+     */
+
     const {
         user,
         loading: authLoading,
     } = useAuth();
 
-  const pathname =
-      usePathname();
+    /*
+     * =========================================
+     * ROUTE
+     * =========================================
+     */
 
-  const [
-    menuOpen,
-    setMenuOpen,
-  ] = useState(false);
+    const pathname =
+        usePathname();
 
-  /*
-   * =========================================
-   * ZUSTAND CART
-   * =========================================
-   */
+    /*
+     * =========================================
+     * MOBILE MENU
+     * =========================================
+     */
 
-  const items =
-      useCartStore(
-          (state) =>
-              state.items
-      );
+    const [
+        menuOpen,
+        setMenuOpen,
+    ] = useState(false);
 
-  const hasHydrated =
-      useCartStore(
-          (state) =>
-              state.hasHydrated
-      );
+    /*
+     * =========================================
+     * ZUSTAND CART
+     * =========================================
+     */
 
-  const cartCount =
-      hasHydrated
-          ? items.reduce(
-              (
-                  total,
-                  item
-              ) =>
-                  total +
-                  item.quantity,
-              0
-          )
-          : 0;
-
-  /*
-   * =========================================
-   * THEME
-   * =========================================
-   */
-
-  const darkMode =
-      useSyncExternalStore(
-          subscribeToTheme,
-          getDarkMode,
-          () => false
-      );
-
-  useEffect(() => {
-    document.documentElement.dataset.theme =
-        darkMode
-            ? "dark"
-            : "light";
-  }, [darkMode]);
-
-  const toggleTheme =
-      () => {
-        localStorage.setItem(
-            "theme",
-            darkMode
-                ? "light"
-                : "dark"
+    const items =
+        useCartStore(
+            (state) =>
+                state.items
         );
 
-        window.dispatchEvent(
-            new Event(
-                "foodly-storage"
+    const hasHydrated =
+        useCartStore(
+            (state) =>
+                state.hasHydrated
+        );
+
+    const cartCount =
+        hasHydrated
+            ? items.reduce(
+                (
+                    total,
+                    item
+                ) =>
+                    total +
+                    item.quantity,
+                0
             )
+            : 0;
+
+    /*
+     * =========================================
+     * THEME
+     * =========================================
+     */
+
+    const darkMode =
+        useSyncExternalStore(
+            subscribeToTheme,
+            getDarkMode,
+            () => false
         );
-      };
 
-  /*
-   * =========================================
-   * MOBILE MENU
-   * =========================================
-   */
+    useEffect(() => {
+        document.documentElement.dataset.theme =
+            darkMode
+                ? "dark"
+                : "light";
+    }, [
+        darkMode,
+    ]);
 
-  const toggleMenu =
-      () => {
-        setMenuOpen(
-            (previous) =>
-                !previous
+    const toggleTheme =
+        () => {
+            localStorage.setItem(
+                "theme",
+                darkMode
+                    ? "light"
+                    : "dark"
+            );
+
+            window.dispatchEvent(
+                new Event(
+                    "foodly-storage"
+                )
+            );
+        };
+
+    /*
+     * =========================================
+     * MOBILE MENU
+     * =========================================
+     */
+
+    const toggleMenu =
+        () => {
+            setMenuOpen(
+                (previous) =>
+                    !previous
+            );
+        };
+
+    const closeMenu =
+        () => {
+            setMenuOpen(false);
+        };
+
+    /*
+     * =========================================
+     * ACTIVE ROUTES
+     * =========================================
+     */
+
+    const isActive = (
+        route: string
+    ) => {
+        if (
+            route === "/"
+        ) {
+            return (
+                pathname === "/"
+            );
+        }
+
+        return pathname.startsWith(
+            route
         );
-      };
+    };
 
-  const closeMenu =
-      () => {
-        setMenuOpen(false);
-      };
+    const isRestaurantsActive =
+        pathname ===
+        "/restaurants" ||
+        pathname.startsWith(
+            "/restaurants/"
+        );
 
-  /*
-   * =========================================
-   * ACTIVE ROUTES
-   * =========================================
-   */
+    const isProductsActive =
+        pathname ===
+        "/products" ||
+        pathname.startsWith(
+            "/products/"
+        );
 
-  const isActive = (
-      route: string
-  ) => {
-    if (route === "/") {
-      return (
-          pathname === "/"
-      );
-    }
+    /*
+     * =========================================
+     * ADMIN
+     * =========================================
+     */
 
-    return pathname.startsWith(
-        route
-    );
-  };
+    const isAdmin =
+        user?.role ===
+        "ADMIN";
 
-  const isRestaurantsActive =
-      pathname ===
-      "/restaurants" ||
-      pathname.startsWith(
-          "/restaurants/"
-      );
+    /*
+     * =========================================
+     * RENDER
+     * =========================================
+     */
 
-  const isProductsActive =
-      pathname ===
-      "/products" ||
-      pathname.startsWith(
-          "/products/"
-      );
+    return (
+        <header className="site-header">
 
-  return (
-      <header className="site-header">
-        <div className="container">
-          <div className="nav-inner">
-            {/* =================================
+            <div className="container">
+
+                <div className="nav-inner">
+
+                    {/* =================================
               LOGO
           ================================= */}
 
-            <Link
-                className="brand"
-                href="/"
-            >
+                    <Link
+                        className="brand"
+                        href="/"
+                    >
+
             <span className="brand-mark">
+
               <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -218,367 +267,489 @@ function Header() {
 
                 <path d="M16 3c-1.6 1-2.2 2.6-2.2 4.6S14.4 11 16 12v9" />
               </svg>
+
             </span>
 
-              Foodly
-            </Link>
+                        Foodly
 
-            {/* =================================
+                    </Link>
+
+                    {/* =================================
               DESKTOP NAVIGATION
           ================================= */}
 
-            <ul className="nav-links ms-3">
-              <li>
-                <Link
-                    className={
-                      pathname ===
-                      "/"
-                          ? "active"
-                          : ""
-                    }
-                    href="/"
-                >
-                  Home
-                </Link>
-              </li>
+                    <ul className="nav-links ms-3">
 
-              <li>
-                <Link
-                    className={
-                      isRestaurantsActive
-                          ? "active"
-                          : ""
-                    }
-                    href="/restaurants"
-                >
-                  Restaurants
-                </Link>
-              </li>
+                        <li>
 
-              <li>
-                <Link
-                    className={
-                      isProductsActive
-                          ? "active"
-                          : ""
-                    }
-                    href="/products"
-                >
-                  Menu
-                </Link>
-              </li>
+                            <Link
+                                className={
+                                    pathname === "/"
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/"
+                            >
+                                Home
+                            </Link>
 
-              <li>
-                <Link
-                    className={
-                      isActive(
-                          "/promotions"
-                      )
-                          ? "active"
-                          : ""
-                    }
-                    href="/promotions"
-                >
-                  Offers
-                </Link>
-              </li>
+                        </li>
 
-              <li>
-                <Link href="/#how">
-                  How it works
-                </Link>
-              </li>
-            </ul>
+                        <li>
 
-            {/* =================================
+                            <Link
+                                className={
+                                    isRestaurantsActive
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/restaurants"
+                            >
+                                Restaurants
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link
+                                className={
+                                    isProductsActive
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/products"
+                            >
+                                Menu
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link
+                                className={
+                                    isActive(
+                                        "/promotions"
+                                    )
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/promotions"
+                            >
+                                Offers
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link href="/#how">
+                                How it works
+                            </Link>
+
+                        </li>
+
+                    </ul>
+
+                    {/* =================================
               ACTIONS
           ================================= */}
 
-            <div className="nav-actions">
-              {/* THEME */}
+                    <div className="nav-actions">
 
-              <button
-                  className="icon-btn"
-                  type="button"
-                  onClick={
-                    toggleTheme
-                  }
-                  aria-label="Switch theme"
-              >
-                {!darkMode ? (
-                    <svg
-                        className="icon-sun"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                    >
-                      <circle
-                          cx="12"
-                          cy="12"
-                          r="4"
-                      />
+                        {/* =================================
+                THEME
+            ================================= */}
 
-                      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4" />
-                    </svg>
-                ) : (
-                    <svg
-                        className="icon-moon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-                    </svg>
-                )}
-              </button>
+                        <button
+                            className="icon-btn"
+                            type="button"
+                            onClick={
+                                toggleTheme
+                            }
+                            aria-label="Switch theme"
+                        >
 
-              {/* =================================
+                            {!darkMode ? (
+
+                                <svg
+                                    className="icon-sun"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                >
+
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="4"
+                                    />
+
+                                    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4" />
+
+                                </svg>
+
+                            ) : (
+
+                                <svg
+                                    className="icon-moon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+
+                                    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+
+                                </svg>
+
+                            )}
+
+                        </button>
+
+                        {/* =================================
                 CART
             ================================= */}
 
-              <Link
-                  href="/checkout"
-                  className="icon-btn cart-btn"
-                  aria-label={`Basket with ${cartCount} items`}
-              >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      width:
-                          "20px",
-                      height:
-                          "20px",
-                    }}
-                >
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <Link
+                            href="/checkout"
+                            className="icon-btn cart-btn"
+                            aria-label={`Basket with ${cartCount} items`}
+                        >
 
-                  <path d="M3 6h18" />
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                style={{
+                                    width:
+                                        "20px",
 
-                  <path d="M16 10a4 4 0 0 1-8 0" />
-                </svg>
+                                    height:
+                                        "20px",
+                                }}
+                            >
 
-                {hasHydrated &&
-                    cartCount >
-                    0 && (
-                        <span className="cart-count">
+                                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+
+                                <path d="M3 6h18" />
+
+                                <path d="M16 10a4 4 0 0 1-8 0" />
+
+                            </svg>
+
+                            {hasHydrated &&
+                                cartCount >
+                                0 && (
+
+                                    <span className="cart-count">
                     {
-                      cartCount
+                        cartCount
                     }
                   </span>
-                    )}
-              </Link>
 
-              {/* SIGN IN */}
+                                )}
 
-                {!authLoading && (
-                    user ? (
-                        <Link
-                            className="btn btn-line desktop-only"
-                            href="/profile"
-                        >
-                            My profile
                         </Link>
-                    ) : (
+
+                        {/* =================================
+                ADMIN BUTTON
+            ================================= */}
+
+                        {!authLoading &&
+                            isAdmin && (
+
+                                <Link
+                                    className="btn btn-brand desktop-only"
+                                    href="/admin"
+                                >
+                                    Admin panel
+                                </Link>
+
+                            )}
+
+                        {/* =================================
+                PROFILE / SIGN IN
+            ================================= */}
+
+                        {!authLoading && (
+
+                            user ? (
+
+                                <Link
+                                    className="btn btn-line desktop-only"
+                                    href="/profile"
+                                >
+                                    My profile
+                                </Link>
+
+                            ) : (
+
+                                <Link
+                                    className="btn btn-line desktop-only"
+                                    href="/login"
+                                >
+                                    Sign in
+                                </Link>
+
+                            )
+
+                        )}
+
+                        {/* =================================
+                ORDER
+            ================================= */}
+
                         <Link
-                            className="btn btn-line desktop-only"
-                            href="/login"
+                            className="btn btn-brand desktop-only"
+                            href="/products"
                         >
-                            Sign in
+                            Order now
                         </Link>
-                    )
-                )}
 
-              {/* ORDER */}
+                        {/* =================================
+                MOBILE MENU BUTTON
+            ================================= */}
 
-              <Link
-                  className="btn btn-brand desktop-only"
-                  href="/products"
-              >
-                Order now
-              </Link>
+                        <button
+                            className="icon-btn nav-toggle"
+                            type="button"
+                            onClick={
+                                toggleMenu
+                            }
+                            aria-expanded={
+                                menuOpen
+                            }
+                            aria-label={
+                                menuOpen
+                                    ? "Close menu"
+                                    : "Open menu"
+                            }
+                        >
 
-              {/* MOBILE BUTTON */}
+                            {menuOpen ? (
 
-              <button
-                  className="icon-btn nav-toggle"
-                  type="button"
-                  onClick={
-                    toggleMenu
-                  }
-                  aria-expanded={
-                    menuOpen
-                  }
-                  aria-label={
-                    menuOpen
-                        ? "Close menu"
-                        : "Open menu"
-                  }
-              >
-                {menuOpen ? (
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.9"
-                        strokeLinecap="round"
-                    >
-                      <path d="M6 6l12 12M18 6L6 18" />
-                    </svg>
-                ) : (
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.9"
-                        strokeLinecap="round"
-                    >
-                      <path d="M4 7h16M4 12h16M4 17h16" />
-                    </svg>
-                )}
-              </button>
-            </div>
-          </div>
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.9"
+                                    strokeLinecap="round"
+                                >
 
-          {/* =================================
+                                    <path d="M6 6l12 12M18 6L6 18" />
+
+                                </svg>
+
+                            ) : (
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.9"
+                                    strokeLinecap="round"
+                                >
+
+                                    <path d="M4 7h16M4 12h16M4 17h16" />
+
+                                </svg>
+
+                            )}
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                {/* =================================
             MOBILE DRAWER
         ================================= */}
 
-          <div
-              className={`nav-drawer ${
-                  menuOpen
-                      ? "open"
-                      : ""
-              }`}
-              id="navDrawer"
-          >
-            <ul className="nav-links">
-              <li>
-                <Link
-                    className={
-                      pathname ===
-                      "/"
-                          ? "active"
-                          : ""
-                    }
-                    href="/"
-                    onClick={
-                      closeMenu
-                    }
+                <div
+                    className={`nav-drawer ${
+                        menuOpen
+                            ? "open"
+                            : ""
+                    }`}
+                    id="navDrawer"
                 >
-                  Home
-                </Link>
-              </li>
 
-              <li>
-                <Link
-                    className={
-                      isRestaurantsActive
-                          ? "active"
-                          : ""
-                    }
-                    href="/restaurants"
-                    onClick={
-                      closeMenu
-                    }
-                >
-                  Restaurants
-                </Link>
-              </li>
+                    <ul className="nav-links">
 
-              <li>
-                <Link
-                    className={
-                      isProductsActive
-                          ? "active"
-                          : ""
-                    }
-                    href="/products"
-                    onClick={
-                      closeMenu
-                    }
-                >
-                  Menu
-                </Link>
-              </li>
+                        <li>
 
-              <li>
-                <Link
-                    className={
-                      isActive(
-                          "/promotions"
-                      )
-                          ? "active"
-                          : ""
-                    }
-                    href="/promotions"
-                    onClick={
-                      closeMenu
-                    }
-                >
-                  Offers
-                </Link>
-              </li>
+                            <Link
+                                className={
+                                    pathname === "/"
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/"
+                                onClick={
+                                    closeMenu
+                                }
+                            >
+                                Home
+                            </Link>
 
-              <li>
-                <Link
-                    href="/#how"
-                    onClick={
-                      closeMenu
-                    }
-                >
-                  How it works
-                </Link>
-              </li>
-            </ul>
+                        </li>
 
-            {/* PROFILE REMOVED */}
+                        <li>
 
-            <div className="drawer-actions">
-                {!authLoading && (
-                    user ? (
+                            <Link
+                                className={
+                                    isRestaurantsActive
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/restaurants"
+                                onClick={
+                                    closeMenu
+                                }
+                            >
+                                Restaurants
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link
+                                className={
+                                    isProductsActive
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/products"
+                                onClick={
+                                    closeMenu
+                                }
+                            >
+                                Menu
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link
+                                className={
+                                    isActive(
+                                        "/promotions"
+                                    )
+                                        ? "active"
+                                        : ""
+                                }
+                                href="/promotions"
+                                onClick={
+                                    closeMenu
+                                }
+                            >
+                                Offers
+                            </Link>
+
+                        </li>
+
+                        <li>
+
+                            <Link
+                                href="/#how"
+                                onClick={
+                                    closeMenu
+                                }
+                            >
+                                How it works
+                            </Link>
+
+                        </li>
+
+                    </ul>
+
+                    {/* =================================
+              MOBILE ACTIONS
+          ================================= */}
+
+                    <div className="drawer-actions">
+
+                        {/* ADMIN */}
+
+                        {!authLoading &&
+                            isAdmin && (
+
+                                <Link
+                                    className="btn btn-brand"
+                                    href="/admin"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                >
+                                    Admin panel
+                                </Link>
+
+                            )}
+
+                        {/* PROFILE / LOGIN */}
+
+                        {!authLoading && (
+
+                            user ? (
+
+                                <Link
+                                    className="btn btn-line"
+                                    href="/profile"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                >
+                                    My profile
+                                </Link>
+
+                            ) : (
+
+                                <Link
+                                    className="btn btn-line"
+                                    href="/login"
+                                    onClick={
+                                        closeMenu
+                                    }
+                                >
+                                    Sign in
+                                </Link>
+
+                            )
+
+                        )}
+
+                        {/* ORDER */}
+
                         <Link
-                            className="btn btn-line"
-                            href="/profile"
-                            onClick={closeMenu}
+                            className="btn btn-brand"
+                            href="/products"
+                            onClick={
+                                closeMenu
+                            }
                         >
-                            My profile
+                            Order now
                         </Link>
-                    ) : (
-                        <Link
-                            className="btn btn-line"
-                            href="/login"
-                            onClick={closeMenu}
-                        >
-                            Sign in
-                        </Link>
-                    )
-                )}
 
-              <Link
-                  className="btn btn-brand"
-                  href="/products"
-                  onClick={
-                    closeMenu
-                  }
-              >
-                Order now
-              </Link>
+                    </div>
+
+                </div>
+
             </div>
-          </div>
-        </div>
-      </header>
-  );
+
+        </header>
+    );
 }
 
 export default Header;
-

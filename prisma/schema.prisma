@@ -123,19 +123,34 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  addresses            Address[]
-  orders               Order[]
-  favorites            Favorite[]
-  wallet               Wallet?
-  restaurants          Restaurant[]          @relation("RestaurantOwner")
-  referralsSent        Referral[]            @relation("ReferralInviter")
-  referralAccepted     Referral?             @relation("ReferralInvitedUser")
-  supportTickets       SupportTicket[]
-  restaurantReviews    RestaurantReview[]
-  productReviews       ProductReview[]
-  refreshTokens        RefreshToken[]
-  passwordResetTokens  PasswordResetToken[]
-  promotionRedemptions PromotionRedemption[]
+  addresses               Address[]
+  orders                  Order[]
+  favorites               Favorite[]
+  wallet                  Wallet?
+  restaurants             Restaurant[]             @relation("RestaurantOwner")
+  referralsSent           Referral[]               @relation("ReferralInviter")
+  referralAccepted        Referral?                @relation("ReferralInvitedUser")
+  supportTickets          SupportTicket[]
+  restaurantReviews       RestaurantReview[]
+  productReviews          ProductReview[]
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  promotionRedemptions    PromotionRedemption[]
+}
+
+model EmailVerificationToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model RefreshToken {
