@@ -1,14 +1,22 @@
 "use client";
 
 import {
-  FormEvent,
   useState,
+} from "react";
+
+import type {
+  FormEvent,
 } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/app/providers/AuthProvider";
+
+type OAuthProvider =
+    | "google"
+    | "facebook"
+    | null;
 
 export default function Register() {
   const router = useRouter();
@@ -27,8 +35,10 @@ export default function Register() {
   const [password, setPassword] =
       useState("");
 
-  const [confirmPassword, setConfirmPassword] =
-      useState("");
+  const [
+    confirmPassword,
+    setConfirmPassword,
+  ] = useState("");
 
   const [remember, setRemember] =
       useState(true);
@@ -39,6 +49,11 @@ export default function Register() {
   const [loading, setLoading] =
       useState(false);
 
+  const [
+    oauthLoading,
+    setOauthLoading,
+  ] = useState<OAuthProvider>(null);
+
   async function handleSubmit(
       event: FormEvent<HTMLFormElement>
   ) {
@@ -46,7 +61,10 @@ export default function Register() {
 
     setError("");
 
-    if (password !== confirmPassword) {
+    if (
+        password !==
+        confirmPassword
+    ) {
       setError(
           "Passwords do not match."
       );
@@ -85,6 +103,24 @@ export default function Register() {
     }
   }
 
+  function handleGoogleLogin() {
+    setError("");
+    setOauthLoading("google");
+
+    window.location.assign(
+        "/api/auth/google"
+    );
+  }
+
+  function handleFacebookLogin() {
+    setError("");
+    setOauthLoading("facebook");
+
+    window.location.assign(
+        "/api/auth/facebook"
+    );
+  }
+
   return (
       <div>
         <div className="auth-wrap">
@@ -107,7 +143,10 @@ export default function Register() {
               </p>
 
               {error && (
-                  <div className="alert alert-danger mb-3">
+                  <div
+                      className="alert alert-danger mb-3"
+                      role="alert"
+                  >
                     {error}
                   </div>
               )}
@@ -131,7 +170,9 @@ export default function Register() {
                       autoComplete="name"
                       value={name}
                       onChange={(e) =>
-                          setName(e.target.value)
+                          setName(
+                              e.target.value
+                          )
                       }
                       required
                   />
@@ -155,7 +196,9 @@ export default function Register() {
                       autoComplete="email"
                       value={email}
                       onChange={(e) =>
-                          setEmail(e.target.value)
+                          setEmail(
+                              e.target.value
+                          )
                       }
                       required
                   />
@@ -183,7 +226,9 @@ export default function Register() {
                       autoComplete="tel"
                       value={phone}
                       onChange={(e) =>
-                          setPhone(e.target.value)
+                          setPhone(
+                              e.target.value
+                          )
                       }
                   />
 
@@ -206,7 +251,9 @@ export default function Register() {
                       autoComplete="new-password"
                       value={password}
                       onChange={(e) =>
-                          setPassword(e.target.value)
+                          setPassword(
+                              e.target.value
+                          )
                       }
                       minLength={8}
                       required
@@ -229,7 +276,9 @@ export default function Register() {
                       className="form-control"
                       placeholder="Repeat your password"
                       autoComplete="new-password"
-                      value={confirmPassword}
+                      value={
+                        confirmPassword
+                      }
                       onChange={(e) =>
                           setConfirmPassword(
                               e.target.value
@@ -269,7 +318,10 @@ export default function Register() {
                   <button
                       type="submit"
                       className="btn btn-brand btn-lg"
-                      disabled={loading}
+                      disabled={
+                          loading ||
+                          oauthLoading !== null
+                      }
                   >
                     {loading
                         ? "Creating account..."
@@ -323,15 +375,33 @@ export default function Register() {
                 <button
                     type="button"
                     className="btn btn-line"
+                    onClick={
+                      handleGoogleLogin
+                    }
+                    disabled={
+                        loading ||
+                        oauthLoading !== null
+                    }
                 >
-                  Continue with Google
+                  {oauthLoading === "google"
+                      ? "Connecting to Google..."
+                      : "Continue with Google"}
                 </button>
 
                 <button
                     type="button"
                     className="btn btn-line"
+                    onClick={
+                      handleFacebookLogin
+                    }
+                    disabled={
+                        loading ||
+                        oauthLoading !== null
+                    }
                 >
-                  Continue with Apple
+                  {oauthLoading === "facebook"
+                      ? "Connecting to Facebook..."
+                      : "Continue with Facebook"}
                 </button>
 
               </div>
@@ -342,9 +412,9 @@ export default function Register() {
                     fontSize: ".84rem",
                   }}
               >
-                By creating an account, you agree
-                to Foodly&apos;s Terms and Privacy
-                Policy.
+                By creating an account,
+                you agree to Foodly&apos;s
+                Terms and Privacy Policy.
               </p>
 
             </div>
@@ -383,6 +453,7 @@ export default function Register() {
                 >
                   Fast checkout
                 </b>
+
                 {" · "}
                 Saved addresses
                 {" · "}

@@ -77,6 +77,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (!user.passwordHash) {
+            return NextResponse.json(
+                {
+                    message: "Invalid email or password.",
+                },
+                {
+                    status: 401,
+                }
+            );
+        }
+
         const passwordMatches = await compare(
             password,
             user.passwordHash

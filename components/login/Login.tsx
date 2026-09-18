@@ -1,8 +1,12 @@
 "use client";
 
 import {
-  FormEvent,
+  useEffect,
   useState,
+} from "react";
+
+import type {
+  FormEvent,
 } from "react";
 
 import Link from "next/link";
@@ -10,20 +14,117 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/app/providers/AuthProvider";
 
+type OAuthProvider =
+    | "google"
+    | "facebook"
+    | null;
+
 export default function Login() {
   const router = useRouter();
 
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] =
+      useState("");
 
-  const [password, setPassword] = useState("");
+  const [password, setPassword] =
+      useState("");
 
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] =
+      useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+      useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+      useState(false);
+
+  const [
+    oauthLoading,
+    setOauthLoading,
+  ] = useState<OAuthProvider>(null);
+
+  useEffect(() => {
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const oauthError =
+        params.get("oauth");
+
+    if (!oauthError) {
+      return;
+    }
+
+    const messages:
+        Record<string, string> = {
+      cancelled:
+          "Google sign-in was cancelled.",
+
+      google_error:
+          "Google could not complete sign-in.",
+
+      invalid_request:
+          "The Google sign-in request was invalid. Please try again.",
+
+      invalid_state:
+          "The Google sign-in session expired or was invalid. Please try again.",
+
+      token_exchange_failed:
+          "Google sign-in could not be completed. Please try again.",
+
+      profile_failed:
+          "We could not load your Google profile.",
+
+      email_not_verified:
+          "Your Google email must be verified before signing in.",
+
+      configuration_error:
+          "Google sign-in is not configured correctly.",
+
+      facebook_cancelled:
+          "Facebook sign-in was cancelled.",
+
+      facebook_error:
+          "Facebook could not complete sign-in.",
+
+      facebook_invalid_request:
+          "The Facebook sign-in request was invalid. Please try again.",
+
+      facebook_invalid_state:
+          "The Facebook sign-in session expired or was invalid. Please try again.",
+
+      facebook_token_exchange_failed:
+          "Facebook sign-in could not be completed. Please try again.",
+
+      facebook_profile_failed:
+          "We could not load your Facebook profile.",
+
+      facebook_email_missing:
+          "Facebook did not provide an email address for this account.",
+
+      facebook_email_exists:
+          "An account with this email already exists. Sign in with your existing method first.",
+
+      facebook_configuration_error:
+          "Facebook sign-in is not configured correctly.",
+
+      account_disabled:
+          "This account is disabled.",
+
+      failed:
+          "Google sign-in failed. Please try again.",
+
+      facebook_failed:
+          "Facebook sign-in failed. Please try again.",
+    };
+
+    setError(
+        messages[oauthError] ||
+        "Social sign-in failed. Please try again."
+    );
+  }, []);
 
   async function handleSubmit(
       event: FormEvent<HTMLFormElement>
@@ -52,6 +153,24 @@ export default function Login() {
     }
   }
 
+  function handleGoogleLogin() {
+    setError("");
+    setOauthLoading("google");
+
+    window.location.assign(
+        "/api/auth/google"
+    );
+  }
+
+  function handleFacebookLogin() {
+    setError("");
+    setOauthLoading("facebook");
+
+    window.location.assign(
+        "/api/auth/facebook"
+    );
+  }
+
   return (
       <div>
         <div className="auth-wrap">
@@ -74,7 +193,10 @@ export default function Login() {
               </p>
 
               {error && (
-                  <div className="alert alert-danger mb-3">
+                  <div
+                      className="alert alert-danger mb-3"
+                      role="alert"
+                  >
                     {error}
                   </div>
               )}
@@ -98,7 +220,9 @@ export default function Login() {
                       autoComplete="email"
                       value={email}
                       onChange={(e) =>
-                          setEmail(e.target.value)
+                          setEmail(
+                              e.target.value
+                          )
                       }
                       required
                   />
@@ -122,7 +246,9 @@ export default function Login() {
                       autoComplete="current-password"
                       value={password}
                       onChange={(e) =>
-                          setPassword(e.target.value)
+                          setPassword(
+                              e.target.value
+                          )
                       }
                       required
                   />
@@ -168,7 +294,10 @@ export default function Login() {
                   <button
                       type="submit"
                       className="btn btn-brand btn-lg"
-                      disabled={loading}
+                      disabled={
+                          loading ||
+                          oauthLoading !== null
+                      }
                   >
                     {loading
                         ? "Signing in..."
@@ -192,7 +321,8 @@ export default function Login() {
                   style={{
                     flex: "1",
                     height: "1px",
-                    background: "var(--line)",
+                    background:
+                        "var(--line)",
                   }}
               />
 
@@ -209,7 +339,8 @@ export default function Login() {
                     style={{
                       flex: "1",
                       height: "1px",
-                      background: "var(--line)",
+                      background:
+                          "var(--line)",
                     }}
                 />
 
@@ -220,15 +351,33 @@ export default function Login() {
                 <button
                     className="btn btn-line"
                     type="button"
+                    onClick={
+                      handleGoogleLogin
+                    }
+                    disabled={
+                        loading ||
+                        oauthLoading !== null
+                    }
                 >
-                  Continue with Google
+                  {oauthLoading === "google"
+                      ? "Connecting to Google..."
+                      : "Continue with Google"}
                 </button>
 
                 <button
                     className="btn btn-line"
                     type="button"
+                    onClick={
+                      handleFacebookLogin
+                    }
+                    disabled={
+                        loading ||
+                        oauthLoading !== null
+                    }
                 >
-                  Continue with Apple
+                  {oauthLoading === "facebook"
+                      ? "Connecting to Facebook..."
+                      : "Continue with Facebook"}
                 </button>
 
               </div>
@@ -247,13 +396,14 @@ export default function Login() {
             <div className="auth-art-inner text-center">
 
               <h2 className="display-md">
-                1.2 million orders and counting
+                Your orders,
+                all in one place
               </h2>
 
               <p className="mb-4">
-                480+ kitchens, 28 minutes on
-                average, and a courier map you can
-                actually watch.
+                Sign in to track deliveries,
+                manage saved addresses and quickly
+                reorder your favorite meals.
               </p>
 
               <div className="d-flex justify-content-center align-items-center gap-3">
@@ -265,14 +415,11 @@ export default function Login() {
                       fontSize: ".9rem",
                     }}
                 >
-                  <b
-                      style={{
-                        color: "#fff",
-                      }}
-                  >
-                    4.9 / 5
-                  </b>{" "}
-                  from 12,400+ reviews
+                  Secure account access
+                  {" · "}
+                  Saved addresses
+                  {" · "}
+                  Order history
                 </div>
 
               </div>

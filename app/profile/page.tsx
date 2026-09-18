@@ -664,6 +664,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
+
                         {/* SECURITY */}
 
                         <div
@@ -674,9 +675,9 @@ export default function ProfilePage() {
                         >
                             <div className="card-body p-4 p-md-5">
 
-                <span className="eyebrow">
-                  Security
-                </span>
+    <span className="eyebrow">
+      Security
+    </span>
 
                                 <h2 className="h3 mb-4">
                                     Login & security
@@ -690,9 +691,9 @@ export default function ProfilePage() {
                                         </h3>
 
                                         <p className="muted mb-0">
-                                            Update your password
-                                            regularly to keep your
-                                            account secure.
+                                            Create a password for email
+                                            sign-in or update your existing
+                                            password.
                                         </p>
                                     </div>
 
@@ -700,7 +701,7 @@ export default function ProfilePage() {
                                         href="/profile/change-password"
                                         className="btn btn-line"
                                     >
-                                        Change password
+                                        Password settings
                                     </Link>
 
                                 </div>
