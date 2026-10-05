@@ -1,4 +1,8 @@
 import {
+    randomUUID,
+} from "crypto";
+
+import {
     NextResponse,
 } from "next/server";
 
@@ -16,6 +20,10 @@ import {
 import {
     prisma,
 } from "@/lib/prisma";
+
+import {
+    buildDeliveryPreview,
+} from "@/lib/maps";
 
 type OrderBody = {
     customerName?: string;
@@ -45,12 +53,6 @@ export async function POST(
          * =====================================
          * AUTH - OPTIONAL
          * =====================================
-         *
-         * Guest:
-         * userId = null
-         *
-         * Logged in:
-         * userId comes ONLY from JWT.
          */
 
         let userId:
@@ -66,10 +68,6 @@ export async function POST(
                         accessToken
                     );
 
-                /*
-                 * Make sure the user still exists
-                 * and is active.
-                 */
                 const user =
                     await prisma.user.findUnique({
                         where: {
@@ -97,17 +95,13 @@ export async function POST(
                     );
                 }
 
-                userId =
-                    user.id;
+                userId = user.id;
             } catch {
                 /*
-                 * If a Bearer token was sent,
-                 * but it is invalid/expired,
-                 * don't silently treat the request
-                 * as a guest.
-                 *
-                 * AuthProvider apiFetch() can refresh
-                 * the access token and retry.
+                 * If a Bearer token was sent
+                 * but is invalid/expired,
+                 * do not silently treat the
+                 * request as guest checkout.
                  */
                 return NextResponse.json(
                     {
@@ -209,6 +203,59 @@ export async function POST(
 
         /*
          * =====================================
+         * DELIVERY ROUTE
+         * =====================================
+         *
+         * IMPORTANT:
+         * We do not trust coordinates from
+         * the browser.
+         *
+         * The server geocodes the delivery
+         * address again and calculates the
+         * restaurant -> customer route.
+         */
+
+        let deliveryPreview;
+
+        try {
+            deliveryPreview =
+                await buildDeliveryPreview({
+                    items:
+                        body.items.map(
+                            (item) => ({
+                                productId:
+                                    Number(item.id),
+
+                                quantity:
+                                item.quantity,
+                            })
+                        ),
+
+                    address:
+                    deliveryAddress,
+
+                    city:
+                    deliveryCity,
+
+                    district:
+                        deliveryDistrict ??
+                        undefined,
+                });
+        } catch (error) {
+            console.error(
+                "DELIVERY ROUTE ERROR:",
+                error
+            );
+
+            throw new CheckoutError(
+                error instanceof Error
+                    ? error.message
+                    : "Unable to calculate the delivery route."
+            );
+        }
+
+        /*
+         * =====================================
          * CALCULATE ORDER
          * =====================================
          */
@@ -236,8 +283,7 @@ export async function POST(
         const orderNumber =
             `FD-${Date.now()
                 .toString(36)
-                .toUpperCase()}-${crypto
-                .randomUUID()
+                .toUpperCase()}-${randomUUID()
                 .slice(0, 5)
                 .toUpperCase()}`;
 
@@ -254,14 +300,13 @@ export async function POST(
                         await tx.order.create({
                             data: {
                                 /*
-                                 * IMPORTANT:
-                                 *
                                  * Logged-in user:
                                  * userId = JWT user id
                                  *
                                  * Guest:
                                  * userId = null
                                  */
+
                                 userId,
 
                                 orderNumber,
@@ -295,6 +340,21 @@ export async function POST(
                                 deliveryAddress,
 
                                 deliveryTime,
+
+                                /*
+                                 * Coordinates are
+                                 * recalculated server-side.
+                                 */
+
+                                deliveryLatitude:
+                                deliveryPreview
+                                    .delivery
+                                    .latitude,
+
+                                deliveryLongitude:
+                                deliveryPreview
+                                    .delivery
+                                    .longitude,
 
                                 /*
                                  * Prices
@@ -349,6 +409,18 @@ export async function POST(
                                 paymentMethod: true,
 
                                 paymentStatus: true,
+
+                                deliveryCity: true,
+
+                                deliveryDistrict: true,
+
+                                deliveryAddress: true,
+
+                                deliveryTime: true,
+
+                                deliveryLatitude: true,
+
+                                deliveryLongitude: true,
 
                                 subtotal: true,
 
@@ -407,12 +479,12 @@ export async function POST(
                                     createdOrder.id,
 
                                     /*
-                                     * Logged-in account
-                                     * gets associated with
-                                     * promo redemption.
+                                     * Logged-in user gets
+                                     * associated with promo.
                                      *
                                      * Guest = null
                                      */
+
                                     userId,
 
                                     discountAmount:
@@ -437,6 +509,44 @@ export async function POST(
                 success: true,
 
                 order,
+
+                delivery: {
+                    latitude:
+                    deliveryPreview
+                        .delivery
+                        .latitude,
+
+                    longitude:
+                    deliveryPreview
+                        .delivery
+                        .longitude,
+
+                    restaurants:
+                        deliveryPreview
+                            .restaurants.map(
+                            (restaurant) => ({
+                                restaurantId:
+                                restaurant
+                                    .restaurantId,
+
+                                restaurantName:
+                                restaurant
+                                    .restaurantName,
+
+                                distanceKm:
+                                restaurant
+                                    .distanceKm,
+
+                                driveMinutes:
+                                restaurant
+                                    .driveMinutes,
+
+                                estimatedDeliveryMinutes:
+                                restaurant
+                                    .estimatedDeliveryMinutes,
+                            })
+                        ),
+                },
             },
             {
                 status: 201,

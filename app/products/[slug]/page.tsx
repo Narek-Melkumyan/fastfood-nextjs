@@ -1,12 +1,16 @@
+import type {
+    Metadata,
+} from "next";
+
 import {
     notFound,
 } from "next/navigation";
 
+import Product from "@/components/product/Product";
+
 import {
     prisma,
 } from "@/lib/prisma";
-import Product from "@/components/product/Product";
-
 
 type Props = {
     params: Promise<{
@@ -14,12 +18,9 @@ type Props = {
     }>;
 };
 
-import type {
-    Metadata,
-} from "next";
-
-
-export async function generateMetadata({params,}: Props): Promise<Metadata> {
+export async function generateMetadata({
+                                           params,
+                                       }: Props): Promise<Metadata> {
     const {
         slug,
     } = await params;
@@ -54,7 +55,6 @@ export async function generateMetadata({params,}: Props): Promise<Metadata> {
     };
 }
 
-
 export default async function ProductPage({
                                               params,
                                           }: Props) {
@@ -78,8 +78,14 @@ export default async function ProductPage({
                 name: true,
                 slug: true,
                 description: true,
+
+                /*
+                 * Stored as USD cents.
+                 * Example:
+                 * 1299 = $12.99
+                 */
                 price: true,
-                currency: true,
+
                 imageUrl: true,
                 ingredients: true,
                 allergens: true,
@@ -105,10 +111,16 @@ export default async function ProductPage({
                         address: true,
                         city: true,
                         logoUrl: true,
+
                         deliveryMinMinutes: true,
                         deliveryMaxMinutes: true,
+
+                        /*
+                         * USD cents.
+                         */
                         deliveryFee: true,
                         minimumOrder: true,
+
                         isAcceptingOrders: true,
                     },
                 },
@@ -123,7 +135,8 @@ export default async function ProductPage({
         await prisma.product.findMany({
             where: {
                 id: {
-                    not: product.id,
+                    not:
+                    product.id,
                 },
 
                 categoryId:
@@ -137,15 +150,20 @@ export default async function ProductPage({
                 },
             },
 
-            take: 3,
+            take:
+                3,
 
             select: {
                 id: true,
                 name: true,
                 slug: true,
                 description: true,
+
+                /*
+                 * USD cents.
+                 */
                 price: true,
-                currency: true,
+
                 imageUrl: true,
                 ingredients: true,
                 allergens: true,
@@ -170,10 +188,16 @@ export default async function ProductPage({
                         address: true,
                         city: true,
                         logoUrl: true,
+
                         deliveryMinMinutes: true,
                         deliveryMaxMinutes: true,
+
+                        /*
+                         * USD cents.
+                         */
                         deliveryFee: true,
                         minimumOrder: true,
+
                         isAcceptingOrders: true,
                     },
                 },

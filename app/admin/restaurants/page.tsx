@@ -50,9 +50,12 @@ const emptyForm = {
     isActive: true,
 };
 
-function money(value: number) {
-    return value.toLocaleString("en-US");
-}
+function money(cents: number) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(cents / 100);
+} 
 
 export default function AdminRestaurantsPage() {
     const { apiFetch } = useAuth();
@@ -1080,8 +1083,7 @@ export default function AdminRestaurantsPage() {
                                         />
 
                                         <span className="input-group-text">
-                      ֏
-                    </span>
+                                           </span>
                                     </div>
                                 </div>
 
@@ -1111,8 +1113,7 @@ export default function AdminRestaurantsPage() {
                                         />
 
                                         <span className="input-group-text">
-                      ֏
-                    </span>
+                                           </span>
                                     </div>
                                 </div>
 
@@ -1440,8 +1441,7 @@ export default function AdminRestaurantsPage() {
                                                 {money(
                                                     restaurant.minimumOrder
                                                 )}
-                                                ֏
-                                            </div>
+                                                                                             </div>
                                         </td>
 
                                         <td>

@@ -39,7 +39,6 @@ type DashboardData = {
         customerPhone: string;
 
         total: number;
-        currency: string;
 
         createdAt: string;
 
@@ -52,10 +51,16 @@ type DashboardData = {
 };
 
 function money(
-    value: number
+    cents: number
 ) {
-    return value.toLocaleString(
-        "en-US"
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+        }
+    ).format(
+        cents / 100
     );
 }
 
@@ -292,8 +297,7 @@ export default function AdminDashboard() {
                                 data.stats
                                     .revenue
                             )}
-                            ֏
-                        </div>
+                                                     </div>
 
                     </div>
 
@@ -495,8 +499,7 @@ export default function AdminDashboard() {
                                                     {money(
                                                         order.total
                                                     )}
-                                                    ֏
-
+                                                     
                                                 </td>
 
                                                 <td className="muted">

@@ -213,7 +213,6 @@ export async function PATCH(
 
                     total: true,
 
-                    currency: true,
 
                     deliveredAt: true,
                     cancelledAt: true,

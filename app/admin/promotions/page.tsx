@@ -1199,8 +1199,7 @@ export default function AdminPromotionsPage() {
                                         />
 
                                         <span className="input-group-text">
-                      ֏
-                    </span>
+                                           </span>
                                     </div>
                                 </div>
 

@@ -31,6 +31,20 @@ function getString(
     return fallback;
 }
 
+function money(
+    cents: number
+) {
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+        }
+    ).format(
+        cents / 100
+    );
+}
+
 function getPrice(
     order: OrderItem
 ) {
@@ -41,16 +55,23 @@ function getPrice(
         order.amount;
 
     if (
-        typeof value === "number"
+        typeof value === "number" &&
+        Number.isFinite(value)
     ) {
-        return `${value.toLocaleString("en-US")}֏`;
+        return money(value);
     }
 
-    if (value) {
-        const number = Number(value);
+    if (
+        typeof value === "string" &&
+        value.trim()
+    ) {
+        const number =
+            Number(value);
 
-        if (!Number.isNaN(number)) {
-            return `${number.toLocaleString("en-US")}֏`;
+        if (
+            Number.isFinite(number)
+        ) {
+            return money(number);
         }
     }
 
@@ -359,3 +380,4 @@ export default function OrdersPage() {
         </main>
     );
 }
+

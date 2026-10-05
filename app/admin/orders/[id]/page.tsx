@@ -55,9 +55,12 @@ type Order = {
     items: OrderItem[];
 };
 
-function money(value: number) {
-    return value.toLocaleString("en-US");
-}
+function money(cents: number) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(cents / 100);
+} 
 
 function formatStatus(status: string) {
     return status
@@ -216,16 +219,14 @@ export default function AdminOrderDetailsPage() {
                                         </td>
 
                                         <td>
-                                            {money(item.unitPrice)}֏
-                                        </td>
+                                            {money(item.unitPrice)}                                         </td>
 
                                         <td>
                                             {item.quantity}
                                         </td>
 
                                         <td className="text-end fw-bold">
-                                            {money(item.lineTotal)}֏
-                                        </td>
+                                            {money(item.lineTotal)}                                         </td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -333,8 +334,7 @@ export default function AdminOrderDetailsPage() {
                 </span>
 
                                 <span>
-                  {money(order.subtotal)}֏
-                </span>
+                  {money(order.subtotal)}                 </span>
                             </div>
 
                             <div className="d-flex justify-content-between mb-2">
@@ -343,8 +343,7 @@ export default function AdminOrderDetailsPage() {
                 </span>
 
                                 <span>
-                  {money(order.deliveryFee)}֏
-                </span>
+                  {money(order.deliveryFee)}                 </span>
                             </div>
 
                             <div className="d-flex justify-content-between mb-2">
@@ -353,8 +352,7 @@ export default function AdminOrderDetailsPage() {
                 </span>
 
                                 <span>
-                  -{money(order.discount)}֏
-                </span>
+                  -{money(order.discount)}                 </span>
                             </div>
 
                             {order.walletCreditUsed > 0 && (
@@ -364,8 +362,7 @@ export default function AdminOrderDetailsPage() {
                   </span>
 
                                     <span>
-                    -{money(order.walletCreditUsed)}֏
-                  </span>
+                    -{money(order.walletCreditUsed)}                   </span>
                                 </div>
                             )}
 
@@ -375,8 +372,7 @@ export default function AdminOrderDetailsPage() {
                                 <span>Total</span>
 
                                 <span>
-                  {money(order.total)}֏
-                </span>
+                  {money(order.total)}                 </span>
                             </div>
 
                             <hr />

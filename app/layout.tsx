@@ -19,6 +19,8 @@ import {
     AuthProvider,
 } from "@/app/providers/AuthProvider";
 
+import "maplibre-gl/dist/maplibre-gl.css";
+
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -119,6 +121,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
+            data-scroll-behavior="smooth"
             className={`${geistSans.variable} ${geistMono.variable}`}
         >
         <body className="d-flex flex-column min-vh-100">

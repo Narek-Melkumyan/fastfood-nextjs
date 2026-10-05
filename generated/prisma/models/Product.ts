@@ -52,7 +52,6 @@ export type ProductMinAggregateOutputType = {
   slug: string | null
   description: string | null
   price: number | null
-  currency: string | null
   imageUrl: string | null
   badge: string | null
   ratingAverage: number | null
@@ -73,7 +72,6 @@ export type ProductMaxAggregateOutputType = {
   slug: string | null
   description: string | null
   price: number | null
-  currency: string | null
   imageUrl: string | null
   badge: string | null
   ratingAverage: number | null
@@ -94,7 +92,6 @@ export type ProductCountAggregateOutputType = {
   slug: number
   description: number
   price: number
-  currency: number
   imageUrl: number
   ingredients: number
   allergens: number
@@ -139,7 +136,6 @@ export type ProductMinAggregateInputType = {
   slug?: true
   description?: true
   price?: true
-  currency?: true
   imageUrl?: true
   badge?: true
   ratingAverage?: true
@@ -160,7 +156,6 @@ export type ProductMaxAggregateInputType = {
   slug?: true
   description?: true
   price?: true
-  currency?: true
   imageUrl?: true
   badge?: true
   ratingAverage?: true
@@ -181,7 +176,6 @@ export type ProductCountAggregateInputType = {
   slug?: true
   description?: true
   price?: true
-  currency?: true
   imageUrl?: true
   ingredients?: true
   allergens?: true
@@ -291,7 +285,6 @@ export type ProductGroupByOutputType = {
   slug: string
   description: string | null
   price: number
-  currency: string
   imageUrl: string | null
   ingredients: string[]
   allergens: string[]
@@ -337,7 +330,6 @@ export type ProductWhereInput = {
   slug?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.IntFilter<"Product"> | number
-  currency?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"Product">
   allergens?: Prisma.StringNullableListFilter<"Product">
@@ -366,7 +358,6 @@ export type ProductOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   allergens?: Prisma.SortOrder
@@ -398,7 +389,6 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.IntFilter<"Product"> | number
-  currency?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"Product">
   allergens?: Prisma.StringNullableListFilter<"Product">
@@ -427,7 +417,6 @@ export type ProductOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   allergens?: Prisma.SortOrder
@@ -458,7 +447,6 @@ export type ProductScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Product"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   price?: Prisma.IntWithAggregatesFilter<"Product"> | number
-  currency?: Prisma.StringWithAggregatesFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"Product">
   allergens?: Prisma.StringNullableListFilter<"Product">
@@ -480,7 +468,6 @@ export type ProductCreateInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -507,7 +494,6 @@ export type ProductUncheckedCreateInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -533,7 +519,6 @@ export type ProductUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -560,7 +545,6 @@ export type ProductUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -587,7 +571,6 @@ export type ProductCreateManyInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -609,7 +592,6 @@ export type ProductUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -630,7 +612,6 @@ export type ProductUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -671,7 +652,6 @@ export type ProductCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   allergens?: Prisma.SortOrder
@@ -704,7 +684,6 @@ export type ProductMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   badge?: Prisma.SortOrder
   ratingAverage?: Prisma.SortOrder
@@ -725,7 +704,6 @@ export type ProductMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   badge?: Prisma.SortOrder
   ratingAverage?: Prisma.SortOrder
@@ -949,7 +927,6 @@ export type ProductCreateWithoutRestaurantInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -975,7 +952,6 @@ export type ProductUncheckedCreateWithoutRestaurantInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1030,7 +1006,6 @@ export type ProductScalarWhereInput = {
   slug?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.IntFilter<"Product"> | number
-  currency?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"Product">
   allergens?: Prisma.StringNullableListFilter<"Product">
@@ -1052,7 +1027,6 @@ export type ProductCreateWithoutCategoryInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1078,7 +1052,6 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1129,7 +1102,6 @@ export type ProductCreateWithoutFavoritesInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1155,7 +1127,6 @@ export type ProductUncheckedCreateWithoutFavoritesInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1196,7 +1167,6 @@ export type ProductUpdateWithoutFavoritesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1222,7 +1192,6 @@ export type ProductUncheckedUpdateWithoutFavoritesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1247,7 +1216,6 @@ export type ProductCreateWithoutReviewsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1273,7 +1241,6 @@ export type ProductUncheckedCreateWithoutReviewsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1314,7 +1281,6 @@ export type ProductUpdateWithoutReviewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1340,7 +1306,6 @@ export type ProductUncheckedUpdateWithoutReviewsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1365,7 +1330,6 @@ export type ProductCreateWithoutPromotionsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1391,7 +1355,6 @@ export type ProductUncheckedCreateWithoutPromotionsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1437,7 +1400,6 @@ export type ProductCreateWithoutOrderItemsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1463,7 +1425,6 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1504,7 +1465,6 @@ export type ProductUpdateWithoutOrderItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1530,7 +1490,6 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1556,7 +1515,6 @@ export type ProductCreateManyRestaurantInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1577,7 +1535,6 @@ export type ProductUpdateWithoutRestaurantInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1603,7 +1560,6 @@ export type ProductUncheckedUpdateWithoutRestaurantInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1629,7 +1585,6 @@ export type ProductUncheckedUpdateManyWithoutRestaurantInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1651,7 +1606,6 @@ export type ProductCreateManyCategoryInput = {
   slug: string
   description?: string | null
   price: number
-  currency?: string
   imageUrl?: string | null
   ingredients?: Prisma.ProductCreateingredientsInput | string[]
   allergens?: Prisma.ProductCreateallergensInput | string[]
@@ -1672,7 +1626,6 @@ export type ProductUpdateWithoutCategoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1698,7 +1651,6 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1724,7 +1676,6 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1745,7 +1696,6 @@ export type ProductUpdateWithoutPromotionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1771,7 +1721,6 @@ export type ProductUncheckedUpdateWithoutPromotionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1797,7 +1746,6 @@ export type ProductUncheckedUpdateManyWithoutPromotionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.ProductUpdateingredientsInput | string[]
   allergens?: Prisma.ProductUpdateallergensInput | string[]
@@ -1878,7 +1826,6 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   slug?: boolean
   description?: boolean
   price?: boolean
-  currency?: boolean
   imageUrl?: boolean
   ingredients?: boolean
   allergens?: boolean
@@ -1908,7 +1855,6 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   description?: boolean
   price?: boolean
-  currency?: boolean
   imageUrl?: boolean
   ingredients?: boolean
   allergens?: boolean
@@ -1933,7 +1879,6 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   description?: boolean
   price?: boolean
-  currency?: boolean
   imageUrl?: boolean
   ingredients?: boolean
   allergens?: boolean
@@ -1958,7 +1903,6 @@ export type ProductSelectScalar = {
   slug?: boolean
   description?: boolean
   price?: boolean
-  currency?: boolean
   imageUrl?: boolean
   ingredients?: boolean
   allergens?: boolean
@@ -1975,7 +1919,7 @@ export type ProductSelectScalar = {
   categoryId?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "currency" | "imageUrl" | "ingredients" | "allergens" | "badge" | "ratingAverage" | "reviewCount" | "isAvailable" | "isFeatured" | "isActive" | "sortOrder" | "createdAt" | "updatedAt" | "restaurantId" | "categoryId", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "price" | "imageUrl" | "ingredients" | "allergens" | "badge" | "ratingAverage" | "reviewCount" | "isAvailable" | "isFeatured" | "isActive" | "sortOrder" | "createdAt" | "updatedAt" | "restaurantId" | "categoryId", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
   category?: boolean | Prisma.ProductCategoryDefaultArgs<ExtArgs>
@@ -2010,7 +1954,6 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     slug: string
     description: string | null
     price: number
-    currency: string
     imageUrl: string | null
     ingredients: string[]
     allergens: string[]
@@ -2459,7 +2402,6 @@ export interface ProductFieldRefs {
   readonly slug: Prisma.FieldRef<"Product", 'String'>
   readonly description: Prisma.FieldRef<"Product", 'String'>
   readonly price: Prisma.FieldRef<"Product", 'Int'>
-  readonly currency: Prisma.FieldRef<"Product", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Product", 'String'>
   readonly ingredients: Prisma.FieldRef<"Product", 'String[]'>
   readonly allergens: Prisma.FieldRef<"Product", 'String[]'>

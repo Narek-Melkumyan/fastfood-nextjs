@@ -324,7 +324,6 @@ model Product {
   slug          String   @unique
   description   String?
   price         Int
-  currency      String   @default("AMD")
   imageUrl      String?
   ingredients   String[]
   allergens     String[]
@@ -501,18 +500,19 @@ model Order {
   customerEmail String?
   customerNote  String?
 
-  deliveryCity     String    @default("Yerevan")
-  deliveryDistrict String?
-  deliveryAddress  String
-  deliveryTime     String?
-  scheduledFor     DateTime?
+  deliveryCity      String    @default("Yerevan")
+  deliveryDistrict  String?
+  deliveryAddress   String
+  deliveryTime      String?
+  scheduledFor      DateTime?
+  deliveryLatitude  Float?
+  deliveryLongitude Float?
 
   subtotal         Int
-  deliveryFee      Int    @default(0)
-  discount         Int    @default(0)
-  walletCreditUsed Int    @default(0)
+  deliveryFee      Int @default(0)
+  discount         Int @default(0)
+  walletCreditUsed Int @default(0)
   total            Int
-  currency         String @default("AMD")
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

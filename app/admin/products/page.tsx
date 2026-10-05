@@ -19,7 +19,6 @@ type Product = {
     slug: string;
     description: string | null;
     price: number;
-    currency: string;
     imageUrl: string | null;
     ingredients: string[];
     allergens: string[];
@@ -78,9 +77,15 @@ const emptyForm = {
     isActive: true,
 };
 
-function money(value: number) {
-    return value.toLocaleString(
-        "en-US"
+function money(cents: number) {
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+        }
+    ).format(
+        cents / 100
     );
 }
 
@@ -519,9 +524,10 @@ export default function AdminProductsPage() {
                 "",
 
             price:
-                String(
-                    product.price
-                ),
+                (
+                    product.price /
+                    100
+                ).toFixed(2),
 
             restaurantId:
                 String(
@@ -610,6 +616,22 @@ export default function AdminProductsPage() {
             setSaving(true);
             setError("");
 
+            const priceDollars =
+                Number(
+                    form.price
+                );
+
+            if (
+                !Number.isFinite(
+                    priceDollars
+                ) ||
+                priceDollars < 0
+            ) {
+                throw new Error(
+                    "Enter a valid USD price."
+                );
+            }
+
             const body = {
                 name:
                 form.name,
@@ -618,8 +640,9 @@ export default function AdminProductsPage() {
                 form.description,
 
                 price:
-                    Number(
-                        form.price
+                    Math.round(
+                        priceDollars *
+                        100
                     ),
 
                 restaurantId:
@@ -964,13 +987,15 @@ export default function AdminProductsPage() {
 
                                 <div className="col-12 col-md-6">
                                     <label className="form-label">
-                                        Price
+                                        Price (USD)
                                     </label>
 
                                     <div className="input-group">
                                         <input
                                             type="number"
                                             min="0"
+                                            step="0.01"
+                                            inputMode="decimal"
                                             className="form-control"
                                             value={
                                                 form.price
@@ -988,8 +1013,8 @@ export default function AdminProductsPage() {
                                         />
 
                                         <span className="input-group-text">
-                      ֏
-                    </span>
+                                            USD
+                                        </span>
                                     </div>
                                 </div>
 
@@ -1610,7 +1635,6 @@ export default function AdminProductsPage() {
                                             {money(
                                                 product.price
                                             )}
-                                            ֏
                                         </td>
 
                                         <td>
@@ -1735,3 +1759,4 @@ export default function AdminProductsPage() {
         </div>
     );
 }
+

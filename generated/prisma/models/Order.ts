@@ -28,6 +28,8 @@ export type AggregateOrder = {
 
 export type OrderAvgAggregateOutputType = {
   id: number | null
+  deliveryLatitude: number | null
+  deliveryLongitude: number | null
   subtotal: number | null
   deliveryFee: number | null
   discount: number | null
@@ -39,6 +41,8 @@ export type OrderAvgAggregateOutputType = {
 
 export type OrderSumAggregateOutputType = {
   id: number | null
+  deliveryLatitude: number | null
+  deliveryLongitude: number | null
   subtotal: number | null
   deliveryFee: number | null
   discount: number | null
@@ -63,12 +67,13 @@ export type OrderMinAggregateOutputType = {
   deliveryAddress: string | null
   deliveryTime: string | null
   scheduledFor: Date | null
+  deliveryLatitude: number | null
+  deliveryLongitude: number | null
   subtotal: number | null
   deliveryFee: number | null
   discount: number | null
   walletCreditUsed: number | null
   total: number | null
-  currency: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deliveredAt: Date | null
@@ -92,12 +97,13 @@ export type OrderMaxAggregateOutputType = {
   deliveryAddress: string | null
   deliveryTime: string | null
   scheduledFor: Date | null
+  deliveryLatitude: number | null
+  deliveryLongitude: number | null
   subtotal: number | null
   deliveryFee: number | null
   discount: number | null
   walletCreditUsed: number | null
   total: number | null
-  currency: string | null
   createdAt: Date | null
   updatedAt: Date | null
   deliveredAt: Date | null
@@ -121,12 +127,13 @@ export type OrderCountAggregateOutputType = {
   deliveryAddress: number
   deliveryTime: number
   scheduledFor: number
+  deliveryLatitude: number
+  deliveryLongitude: number
   subtotal: number
   deliveryFee: number
   discount: number
   walletCreditUsed: number
   total: number
-  currency: number
   createdAt: number
   updatedAt: number
   deliveredAt: number
@@ -139,6 +146,8 @@ export type OrderCountAggregateOutputType = {
 
 export type OrderAvgAggregateInputType = {
   id?: true
+  deliveryLatitude?: true
+  deliveryLongitude?: true
   subtotal?: true
   deliveryFee?: true
   discount?: true
@@ -150,6 +159,8 @@ export type OrderAvgAggregateInputType = {
 
 export type OrderSumAggregateInputType = {
   id?: true
+  deliveryLatitude?: true
+  deliveryLongitude?: true
   subtotal?: true
   deliveryFee?: true
   discount?: true
@@ -174,12 +185,13 @@ export type OrderMinAggregateInputType = {
   deliveryAddress?: true
   deliveryTime?: true
   scheduledFor?: true
+  deliveryLatitude?: true
+  deliveryLongitude?: true
   subtotal?: true
   deliveryFee?: true
   discount?: true
   walletCreditUsed?: true
   total?: true
-  currency?: true
   createdAt?: true
   updatedAt?: true
   deliveredAt?: true
@@ -203,12 +215,13 @@ export type OrderMaxAggregateInputType = {
   deliveryAddress?: true
   deliveryTime?: true
   scheduledFor?: true
+  deliveryLatitude?: true
+  deliveryLongitude?: true
   subtotal?: true
   deliveryFee?: true
   discount?: true
   walletCreditUsed?: true
   total?: true
-  currency?: true
   createdAt?: true
   updatedAt?: true
   deliveredAt?: true
@@ -232,12 +245,13 @@ export type OrderCountAggregateInputType = {
   deliveryAddress?: true
   deliveryTime?: true
   scheduledFor?: true
+  deliveryLatitude?: true
+  deliveryLongitude?: true
   subtotal?: true
   deliveryFee?: true
   discount?: true
   walletCreditUsed?: true
   total?: true
-  currency?: true
   createdAt?: true
   updatedAt?: true
   deliveredAt?: true
@@ -348,12 +362,13 @@ export type OrderGroupByOutputType = {
   deliveryAddress: string
   deliveryTime: string | null
   scheduledFor: Date | null
+  deliveryLatitude: number | null
+  deliveryLongitude: number | null
   subtotal: number
   deliveryFee: number
   discount: number
   walletCreditUsed: number
   total: number
-  currency: string
   createdAt: Date
   updatedAt: Date
   deliveredAt: Date | null
@@ -400,12 +415,13 @@ export type OrderWhereInput = {
   deliveryAddress?: Prisma.StringFilter<"Order"> | string
   deliveryTime?: Prisma.StringNullableFilter<"Order"> | string | null
   scheduledFor?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  deliveryLatitude?: Prisma.FloatNullableFilter<"Order"> | number | null
+  deliveryLongitude?: Prisma.FloatNullableFilter<"Order"> | number | null
   subtotal?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
   discount?: Prisma.IntFilter<"Order"> | number
   walletCreditUsed?: Prisma.IntFilter<"Order"> | number
   total?: Prisma.IntFilter<"Order"> | number
-  currency?: Prisma.StringFilter<"Order"> | string
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -437,12 +453,13 @@ export type OrderOrderByWithRelationInput = {
   deliveryAddress?: Prisma.SortOrder
   deliveryTime?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledFor?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   walletCreditUsed?: Prisma.SortOrder
   total?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -477,12 +494,13 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   deliveryAddress?: Prisma.StringFilter<"Order"> | string
   deliveryTime?: Prisma.StringNullableFilter<"Order"> | string | null
   scheduledFor?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  deliveryLatitude?: Prisma.FloatNullableFilter<"Order"> | number | null
+  deliveryLongitude?: Prisma.FloatNullableFilter<"Order"> | number | null
   subtotal?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
   discount?: Prisma.IntFilter<"Order"> | number
   walletCreditUsed?: Prisma.IntFilter<"Order"> | number
   total?: Prisma.IntFilter<"Order"> | number
-  currency?: Prisma.StringFilter<"Order"> | string
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -514,12 +532,13 @@ export type OrderOrderByWithAggregationInput = {
   deliveryAddress?: Prisma.SortOrder
   deliveryTime?: Prisma.SortOrderInput | Prisma.SortOrder
   scheduledFor?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   walletCreditUsed?: Prisma.SortOrder
   total?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -551,12 +570,13 @@ export type OrderScalarWhereWithAggregatesInput = {
   deliveryAddress?: Prisma.StringWithAggregatesFilter<"Order"> | string
   deliveryTime?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   scheduledFor?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  deliveryLatitude?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
+  deliveryLongitude?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
   subtotal?: Prisma.IntWithAggregatesFilter<"Order"> | number
   deliveryFee?: Prisma.IntWithAggregatesFilter<"Order"> | number
   discount?: Prisma.IntWithAggregatesFilter<"Order"> | number
   walletCreditUsed?: Prisma.IntWithAggregatesFilter<"Order"> | number
   total?: Prisma.IntWithAggregatesFilter<"Order"> | number
-  currency?: Prisma.StringWithAggregatesFilter<"Order"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
@@ -579,12 +599,13 @@ export type OrderCreateInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -614,12 +635,13 @@ export type OrderUncheckedCreateInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -648,12 +670,13 @@ export type OrderUpdateInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -683,12 +706,13 @@ export type OrderUncheckedUpdateInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -718,12 +742,13 @@ export type OrderCreateManyInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -746,12 +771,13 @@ export type OrderUpdateManyMutationInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -773,12 +799,13 @@ export type OrderUncheckedUpdateManyInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -822,12 +849,13 @@ export type OrderCountOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   deliveryTime?: Prisma.SortOrder
   scheduledFor?: Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   walletCreditUsed?: Prisma.SortOrder
   total?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
@@ -838,6 +866,8 @@ export type OrderCountOrderByAggregateInput = {
 
 export type OrderAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
@@ -862,12 +892,13 @@ export type OrderMaxOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   deliveryTime?: Prisma.SortOrder
   scheduledFor?: Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   walletCreditUsed?: Prisma.SortOrder
   total?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
@@ -891,12 +922,13 @@ export type OrderMinOrderByAggregateInput = {
   deliveryAddress?: Prisma.SortOrder
   deliveryTime?: Prisma.SortOrder
   scheduledFor?: Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
   walletCreditUsed?: Prisma.SortOrder
   total?: Prisma.SortOrder
-  currency?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
@@ -907,6 +939,8 @@ export type OrderMinOrderByAggregateInput = {
 
 export type OrderSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  deliveryLatitude?: Prisma.SortOrder
+  deliveryLongitude?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   deliveryFee?: Prisma.SortOrder
   discount?: Prisma.SortOrder
@@ -1118,12 +1152,13 @@ export type OrderCreateWithoutUserInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1152,12 +1187,13 @@ export type OrderUncheckedCreateWithoutUserInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1215,12 +1251,13 @@ export type OrderScalarWhereInput = {
   deliveryAddress?: Prisma.StringFilter<"Order"> | string
   deliveryTime?: Prisma.StringNullableFilter<"Order"> | string | null
   scheduledFor?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  deliveryLatitude?: Prisma.FloatNullableFilter<"Order"> | number | null
+  deliveryLongitude?: Prisma.FloatNullableFilter<"Order"> | number | null
   subtotal?: Prisma.IntFilter<"Order"> | number
   deliveryFee?: Prisma.IntFilter<"Order"> | number
   discount?: Prisma.IntFilter<"Order"> | number
   walletCreditUsed?: Prisma.IntFilter<"Order"> | number
   total?: Prisma.IntFilter<"Order"> | number
-  currency?: Prisma.StringFilter<"Order"> | string
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
@@ -1243,12 +1280,13 @@ export type OrderCreateWithoutRestaurantReviewsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1277,12 +1315,13 @@ export type OrderUncheckedCreateWithoutRestaurantReviewsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1326,12 +1365,13 @@ export type OrderUpdateWithoutRestaurantReviewsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1360,12 +1400,13 @@ export type OrderUncheckedUpdateWithoutRestaurantReviewsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1393,12 +1434,13 @@ export type OrderCreateWithoutProductReviewsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1427,12 +1469,13 @@ export type OrderUncheckedCreateWithoutProductReviewsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1476,12 +1519,13 @@ export type OrderUpdateWithoutProductReviewsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1510,12 +1554,13 @@ export type OrderUncheckedUpdateWithoutProductReviewsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1543,12 +1588,13 @@ export type OrderCreateWithoutPromotionInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1577,12 +1623,13 @@ export type OrderUncheckedCreateWithoutPromotionInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1636,12 +1683,13 @@ export type OrderCreateWithoutPromotionRedemptionInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1670,12 +1718,13 @@ export type OrderUncheckedCreateWithoutPromotionRedemptionInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1719,12 +1768,13 @@ export type OrderUpdateWithoutPromotionRedemptionInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1753,12 +1803,13 @@ export type OrderUncheckedUpdateWithoutPromotionRedemptionInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1786,12 +1837,13 @@ export type OrderCreateWithoutItemsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1820,12 +1872,13 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1869,12 +1922,13 @@ export type OrderUpdateWithoutItemsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1903,12 +1957,13 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1936,12 +1991,13 @@ export type OrderCreateWithoutWalletTransactionsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -1970,12 +2026,13 @@ export type OrderUncheckedCreateWithoutWalletTransactionsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -2019,12 +2076,13 @@ export type OrderUpdateWithoutWalletTransactionsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2053,12 +2111,13 @@ export type OrderUncheckedUpdateWithoutWalletTransactionsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2086,12 +2145,13 @@ export type OrderCreateWithoutSupportTicketsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -2120,12 +2180,13 @@ export type OrderUncheckedCreateWithoutSupportTicketsInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -2169,12 +2230,13 @@ export type OrderUpdateWithoutSupportTicketsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2203,12 +2265,13 @@ export type OrderUncheckedUpdateWithoutSupportTicketsInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2237,12 +2300,13 @@ export type OrderCreateManyUserInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -2264,12 +2328,13 @@ export type OrderUpdateWithoutUserInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2298,12 +2363,13 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2332,12 +2398,13 @@ export type OrderUncheckedUpdateManyWithoutUserInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2360,12 +2427,13 @@ export type OrderCreateManyPromotionInput = {
   deliveryAddress: string
   deliveryTime?: string | null
   scheduledFor?: Date | string | null
+  deliveryLatitude?: number | null
+  deliveryLongitude?: number | null
   subtotal: number
   deliveryFee?: number
   discount?: number
   walletCreditUsed?: number
   total: number
-  currency?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deliveredAt?: Date | string | null
@@ -2387,12 +2455,13 @@ export type OrderUpdateWithoutPromotionInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2421,12 +2490,13 @@ export type OrderUncheckedUpdateWithoutPromotionInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2455,12 +2525,13 @@ export type OrderUncheckedUpdateManyWithoutPromotionInput = {
   deliveryAddress?: Prisma.StringFieldUpdateOperationsInput | string
   deliveryTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scheduledFor?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deliveryLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  deliveryLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   subtotal?: Prisma.IntFieldUpdateOperationsInput | number
   deliveryFee?: Prisma.IntFieldUpdateOperationsInput | number
   discount?: Prisma.IntFieldUpdateOperationsInput | number
   walletCreditUsed?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
-  currency?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2550,12 +2621,13 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   deliveryAddress?: boolean
   deliveryTime?: boolean
   scheduledFor?: boolean
+  deliveryLatitude?: boolean
+  deliveryLongitude?: boolean
   subtotal?: boolean
   deliveryFee?: boolean
   discount?: boolean
   walletCreditUsed?: boolean
   total?: boolean
-  currency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deliveredAt?: boolean
@@ -2588,12 +2660,13 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   deliveryAddress?: boolean
   deliveryTime?: boolean
   scheduledFor?: boolean
+  deliveryLatitude?: boolean
+  deliveryLongitude?: boolean
   subtotal?: boolean
   deliveryFee?: boolean
   discount?: boolean
   walletCreditUsed?: boolean
   total?: boolean
-  currency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deliveredAt?: boolean
@@ -2619,12 +2692,13 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   deliveryAddress?: boolean
   deliveryTime?: boolean
   scheduledFor?: boolean
+  deliveryLatitude?: boolean
+  deliveryLongitude?: boolean
   subtotal?: boolean
   deliveryFee?: boolean
   discount?: boolean
   walletCreditUsed?: boolean
   total?: boolean
-  currency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deliveredAt?: boolean
@@ -2650,12 +2724,13 @@ export type OrderSelectScalar = {
   deliveryAddress?: boolean
   deliveryTime?: boolean
   scheduledFor?: boolean
+  deliveryLatitude?: boolean
+  deliveryLongitude?: boolean
   subtotal?: boolean
   deliveryFee?: boolean
   discount?: boolean
   walletCreditUsed?: boolean
   total?: boolean
-  currency?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deliveredAt?: boolean
@@ -2664,7 +2739,7 @@ export type OrderSelectScalar = {
   promotionId?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "status" | "paymentMethod" | "paymentStatus" | "customerName" | "customerPhone" | "customerEmail" | "customerNote" | "deliveryCity" | "deliveryDistrict" | "deliveryAddress" | "deliveryTime" | "scheduledFor" | "subtotal" | "deliveryFee" | "discount" | "walletCreditUsed" | "total" | "currency" | "createdAt" | "updatedAt" | "deliveredAt" | "cancelledAt" | "userId" | "promotionId", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "status" | "paymentMethod" | "paymentStatus" | "customerName" | "customerPhone" | "customerEmail" | "customerNote" | "deliveryCity" | "deliveryDistrict" | "deliveryAddress" | "deliveryTime" | "scheduledFor" | "deliveryLatitude" | "deliveryLongitude" | "subtotal" | "deliveryFee" | "discount" | "walletCreditUsed" | "total" | "createdAt" | "updatedAt" | "deliveredAt" | "cancelledAt" | "userId" | "promotionId", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Order$userArgs<ExtArgs>
   promotion?: boolean | Prisma.Order$promotionArgs<ExtArgs>
@@ -2712,12 +2787,13 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     deliveryAddress: string
     deliveryTime: string | null
     scheduledFor: Date | null
+    deliveryLatitude: number | null
+    deliveryLongitude: number | null
     subtotal: number
     deliveryFee: number
     discount: number
     walletCreditUsed: number
     total: number
-    currency: string
     createdAt: Date
     updatedAt: Date
     deliveredAt: Date | null
@@ -3169,12 +3245,13 @@ export interface OrderFieldRefs {
   readonly deliveryAddress: Prisma.FieldRef<"Order", 'String'>
   readonly deliveryTime: Prisma.FieldRef<"Order", 'String'>
   readonly scheduledFor: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly deliveryLatitude: Prisma.FieldRef<"Order", 'Float'>
+  readonly deliveryLongitude: Prisma.FieldRef<"Order", 'Float'>
   readonly subtotal: Prisma.FieldRef<"Order", 'Int'>
   readonly deliveryFee: Prisma.FieldRef<"Order", 'Int'>
   readonly discount: Prisma.FieldRef<"Order", 'Int'>
   readonly walletCreditUsed: Prisma.FieldRef<"Order", 'Int'>
   readonly total: Prisma.FieldRef<"Order", 'Int'>
-  readonly currency: Prisma.FieldRef<"Order", 'String'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly deliveredAt: Prisma.FieldRef<"Order", 'DateTime'>

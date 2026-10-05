@@ -1,6 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
+
 import Link from "next/link";
 
 type Cuisine = {
@@ -15,14 +19,20 @@ type Restaurant = {
   slug: string;
   description: string | null;
   coverImageUrl: string | null;
+
   deliveryMinMinutes: number;
   deliveryMaxMinutes: number;
+
+  // USD cents
   deliveryFee: number;
   minimumOrder: number;
   freeDeliveryFrom: number | null;
+
   ratingAverage: number;
   reviewCount: number;
+
   isAcceptingOrders: boolean;
+
   cuisines: Cuisine[];
 };
 
@@ -30,51 +40,146 @@ type Props = {
   restaurants: Restaurant[];
 };
 
+function money(
+    cents: number
+) {
+  return new Intl.NumberFormat(
+      "en-US",
+      {
+        style:
+            "currency",
+
+        currency:
+            "USD",
+
+        minimumFractionDigits:
+            2,
+
+        maximumFractionDigits:
+            2,
+      }
+  ).format(
+      cents / 100
+  );
+}
+
 export default function Restaurants({
                                       restaurants,
                                     }: Props) {
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("recommended");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
-  const filteredRestaurants = useMemo(() => {
-    let result = restaurants.filter((restaurant) => {
-      const text = search.toLowerCase();
+  const [
+    sort,
+    setSort,
+  ] = useState(
+      "recommended"
+  );
 
-      return (
-          restaurant.name.toLowerCase().includes(text) ||
-          restaurant.cuisines.some((cuisine) =>
-              cuisine.name.toLowerCase().includes(text)
-          )
-      );
-    });
+  const filteredRestaurants =
+      useMemo(() => {
+        let result =
+            restaurants.filter(
+                (
+                    restaurant
+                ) => {
+                  const text =
+                      search
+                          .trim()
+                          .toLowerCase();
 
-    if (sort === "rating") {
-      result = [...result].sort(
-          (a, b) => b.ratingAverage - a.ratingAverage
-      );
-    }
+                  if (!text) {
+                    return true;
+                  }
 
-    if (sort === "fastest") {
-      result = [...result].sort(
-          (a, b) =>
-              a.deliveryMinMinutes - b.deliveryMinMinutes
-      );
-    }
+                  return (
+                      restaurant.name
+                          .toLowerCase()
+                          .includes(
+                              text
+                          ) ||
+                      restaurant.cuisines.some(
+                          (
+                              cuisine
+                          ) =>
+                              cuisine.name
+                                  .toLowerCase()
+                                  .includes(
+                                      text
+                                  )
+                      )
+                  );
+                }
+            );
 
-    if (sort === "delivery") {
-      result = [...result].sort(
-          (a, b) => a.deliveryFee - b.deliveryFee
-      );
-    }
+        if (
+            sort ===
+            "rating"
+        ) {
+          result =
+              [
+                ...result,
+              ].sort(
+                  (
+                      a,
+                      b
+                  ) =>
+                      b.ratingAverage -
+                      a.ratingAverage
+              );
+        }
 
-    return result;
-  }, [restaurants, search, sort]);
+        if (
+            sort ===
+            "fastest"
+        ) {
+          result =
+              [
+                ...result,
+              ].sort(
+                  (
+                      a,
+                      b
+                  ) =>
+                      a.deliveryMinMinutes -
+                      b.deliveryMinMinutes
+              );
+        }
+
+        if (
+            sort ===
+            "delivery"
+        ) {
+          result =
+              [
+                ...result,
+              ].sort(
+                  (
+                      a,
+                      b
+                  ) =>
+                      a.deliveryFee -
+                      b.deliveryFee
+              );
+        }
+
+        return result;
+      }, [
+        restaurants,
+        search,
+        sort,
+      ]);
 
   return (
       <main>
         <section className="section-sm">
+
           <div className="container">
+
             <div className="text-center mb-5">
+
             <span className="eyebrow">
               Restaurants
             </span>
@@ -82,40 +187,71 @@ export default function Restaurants({
               <h1 className="display-lg">
                 Find your next meal
               </h1>
+
             </div>
 
             <div
                 className="search-field mx-auto"
-                style={{ maxWidth: "650px" }}
+                style={{
+                  maxWidth:
+                      "650px",
+                }}
             >
               <input
                   type="search"
                   placeholder="Search restaurants or cuisines..."
-                  value={search}
-                  onChange={(e) =>
-                      setSearch(e.target.value)
+                  value={
+                    search
+                  }
+                  onChange={(
+                      event
+                  ) =>
+                      setSearch(
+                          event.target
+                              .value
+                      )
                   }
               />
             </div>
+
           </div>
+
         </section>
 
         <section className="section pt-0">
+
           <div className="container">
+
             <div className="toolbar mb-4">
+
               <div className="count">
-                <b>{filteredRestaurants.length}</b>{" "}
+                <b>
+                  {
+                    filteredRestaurants.length
+                  }
+                </b>{" "}
                 restaurants found
               </div>
 
               <select
                   className="form-select"
-                  style={{ width: "auto" }}
-                  value={sort}
-                  onChange={(e) =>
-                      setSort(e.target.value)
+                  style={{
+                    width:
+                        "auto",
+                  }}
+                  value={
+                    sort
+                  }
+                  onChange={(
+                      event
+                  ) =>
+                      setSort(
+                          event.target
+                              .value
+                      )
                   }
               >
+
                 <option value="recommended">
                   Recommended
                 </option>
@@ -131,99 +267,174 @@ export default function Restaurants({
                 <option value="delivery">
                   Delivery fee
                 </option>
+
               </select>
+
             </div>
 
             <div className="row g-4">
-              {filteredRestaurants.map(
-                  (restaurant) => (
-                      <div
-                          key={restaurant.id}
-                          className="col-12 col-md-6 col-xl-4"
-                      >
-                        <article className="tile h-100">
-                          <div
-                              className="tile-media"
-                              style={{
-                                aspectRatio: "16/10",
-                              }}
-                          >
-                            <img
-                                src={
-                                    restaurant.coverImageUrl ||
-                                    ""
-                                }
-                                alt={restaurant.name}
-                            />
 
-                            {restaurant.cuisines[0] && (
-                                <span className="media-tag">
-                          {
-                            restaurant
-                                .cuisines[0].name
-                          }
-                        </span>
-                            )}
-                          </div>
+              {
+                filteredRestaurants.map(
+                    (
+                        restaurant
+                    ) => (
+                        <div
+                            key={
+                              restaurant.id
+                            }
+                            className="col-12 col-md-6 col-xl-4"
+                        >
 
-                          <div className="tile-body">
-                            <div className="d-flex justify-content-between align-items-start gap-2">
-                              <h3 className="tile-title">
-                                {restaurant.name}
-                              </h3>
+                          <article className="tile h-100">
 
-                              <span className="rating">
-                          ⭐{" "}
-                                {restaurant.ratingAverage.toFixed(
-                                    1
-                                )}
-                        </span>
-                            </div>
-
-                            <p className="tile-meta">
-                              {
-                                restaurant.deliveryMinMinutes
-                              }
-                              –
-                              {
-                                restaurant.deliveryMaxMinutes
-                              }{" "}
-                              min ·{" "}
-                              {restaurant.deliveryFee === 0
-                                  ? "Free delivery"
-                                  : `Delivery from ${restaurant.deliveryFee.toLocaleString()}֏`}
-                            </p>
-
-                            <div className="d-flex gap-2 flex-wrap mb-3">
-                        <span className="badge-soft is-green">
-                          {restaurant.isAcceptingOrders
-                              ? "Open now"
-                              : "Closed"}
-                        </span>
-
-                              {restaurant.freeDeliveryFrom && (
-                                  <span className="badge-soft">
-                            Free over{" "}
-                                    {restaurant.freeDeliveryFrom.toLocaleString()}
-                                    ֏
-                          </span>
-                              )}
-                            </div>
-
-                            <Link
-                                className="btn btn-line w-100 mt-auto"
-                                href={`/restaurants/${restaurant.slug}`}
+                            <div
+                                className="tile-media"
+                                style={{
+                                  aspectRatio:
+                                      "16/10",
+                                }}
                             >
-                              View menu
-                            </Link>
-                          </div>
-                        </article>
-                      </div>
-                  )
-              )}
+
+                              <img
+                                  src={
+                                      restaurant.coverImageUrl ||
+                                      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=900&auto=format&fit=crop"
+                                  }
+                                  alt={
+                                    restaurant.name
+                                  }
+                              />
+
+                              {
+                                  restaurant
+                                      .cuisines[0] && (
+                                      <span className="media-tag">
+                              {
+                                restaurant
+                                    .cuisines[0]
+                                    .name
+                              }
+                            </span>
+                                  )
+                              }
+
+                            </div>
+
+                            <div className="tile-body">
+
+                              <div className="d-flex justify-content-between align-items-start gap-2">
+
+                                <h3 className="tile-title">
+                                  {
+                                    restaurant.name
+                                  }
+                                </h3>
+
+                                <span className="rating">
+                            ⭐{" "}
+                                  {
+                                    restaurant.ratingAverage.toFixed(
+                                        1
+                                    )
+                                  }
+                          </span>
+
+                              </div>
+
+                              <p className="tile-meta">
+
+                                {
+                                  restaurant.deliveryMinMinutes
+                                }
+                                –
+                                {
+                                  restaurant.deliveryMaxMinutes
+                                }{" "}
+                                min ·{" "}
+
+                                {
+                                  restaurant.deliveryFee ===
+                                  0
+                                      ? "Free delivery"
+                                      : `Delivery from ${money(
+                                          restaurant.deliveryFee
+                                      )}`
+                                }
+
+                              </p>
+
+                              <div className="d-flex gap-2 flex-wrap mb-3">
+
+                          <span
+                              className={`badge-soft ${
+                                  restaurant.isAcceptingOrders
+                                      ? "is-green"
+                                      : ""
+                              }`}
+                          >
+                            {
+                              restaurant.isAcceptingOrders
+                                  ? "Open now"
+                                  : "Closed"
+                            }
+                          </span>
+
+                                {
+                                    restaurant.freeDeliveryFrom !==
+                                    null && (
+                                        <span className="badge-soft">
+                                Free over{" "}
+                                          {
+                                            money(
+                                                restaurant.freeDeliveryFrom
+                                            )
+                                          }
+                              </span>
+                                    )
+                                }
+
+                              </div>
+
+                              <Link
+                                  className="btn btn-line w-100 mt-auto"
+                                  href={`/restaurants/${restaurant.slug}`}
+                              >
+                                View menu
+                              </Link>
+
+                            </div>
+
+                          </article>
+
+                        </div>
+                    )
+                )
+              }
+
             </div>
+
+            {
+                filteredRestaurants.length ===
+                0 && (
+                    <div className="empty-state mt-4">
+
+                      <div className="ico">
+                        🍽️
+                      </div>
+
+                      <p className="mb-0">
+                        No restaurants found.
+                      </p>
+
+                    </div>
+                )
+            }
+
           </div>
+
         </section>
+
       </main>
   );
 }

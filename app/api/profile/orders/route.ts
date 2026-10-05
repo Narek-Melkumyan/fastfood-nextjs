@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
                 discount: true,
                 walletCreditUsed: true,
                 total: true,
-                currency: true,
 
                 createdAt: true,
                 deliveredAt: true,

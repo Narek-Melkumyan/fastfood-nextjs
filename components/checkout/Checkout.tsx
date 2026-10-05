@@ -14,6 +14,10 @@ import {
 import {
     useAuth,
 } from "@/app/providers/AuthProvider";
+import DeliveryMap from "@/components/checkout/DeliveryMap";
+import type { DeliveryPreview } from "@/lib/maps";
+
+
 
 /*
  * =========================================
@@ -136,6 +140,200 @@ const pageStyles = `
     font-weight:700;
     white-space:nowrap;
   }
+
+  @media (max-width:991.98px){
+    .summary-sticky{
+      position:static;
+    }
+  }
+
+  @media (max-width:767.98px){
+    .stepper{
+      gap:.5rem;
+    }
+
+    .stepper .st{
+      font-size:.8rem;
+    }
+
+    .stepper .sep{
+      min-width:10px;
+    }
+  }
+
+  @media (max-width:575.98px){
+    .stepper .sep{
+      display:none;
+    }
+
+    .stepper{
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+
+    .stepper .st{
+      flex:1 1 30%;
+      flex-direction:column;
+      text-align:center;
+      gap:.35rem;
+    }
+
+    .pay-option{
+      padding:.9rem;
+    }
+  }
+    .delivery-route-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    margin-top:18px;
+  }
+
+  .delivery-route-card{
+    position:relative;
+    overflow:hidden;
+    padding:18px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:var(--surface);
+    box-shadow:0 8px 24px rgba(17,17,17,.05);
+  }
+
+  .delivery-route-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:4px;
+    height:100%;
+    background:var(--brand);
+  }
+
+  .delivery-route-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  }
+
+  .delivery-route-restaurant{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+
+  .delivery-route-icon{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    background:var(--brand-tint);
+    color:var(--brand);
+    font-size:18px;
+  }
+
+  .delivery-route-name{
+    margin:0;
+    font-size:.95rem;
+    font-weight:800;
+    color:var(--ink);
+  }
+
+  .delivery-route-label{
+    margin-top:2px;
+    font-size:.75rem;
+    color:var(--muted);
+  }
+
+  .delivery-route-eta{
+    flex:0 0 auto;
+    padding:6px 10px;
+    border-radius:999px;
+    background:var(--accent-tint);
+    color:var(--accent);
+    font-size:.75rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .delivery-route-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+  }
+
+  .delivery-route-stat{
+    padding:11px 12px;
+    border-radius:13px;
+    background:var(--surface-2);
+  }
+
+  .delivery-route-stat-label{
+    display:block;
+    margin-bottom:2px;
+    font-size:.7rem;
+    color:var(--muted);
+  }
+
+  .delivery-route-stat-value{
+    font-size:.9rem;
+    font-weight:800;
+    color:var(--ink);
+  }
+
+  .delivery-address-card{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    margin-top:16px;
+    padding:14px 16px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:var(--surface-2);
+  }
+
+  .delivery-address-icon{
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+    display:grid;
+    place-items:center;
+    border-radius:11px;
+    background:#111;
+    color:#fff;
+  }
+
+  .delivery-address-title{
+    margin-bottom:2px;
+    font-size:.75rem;
+    color:var(--muted);
+  }
+
+  .delivery-address-value{
+    font-size:.9rem;
+    font-weight:700;
+    color:var(--ink);
+    word-break:break-word;
+  }
+
+  @media (max-width:767.98px){
+    .delivery-route-grid{
+      grid-template-columns:1fr;
+    }
+
+    .delivery-route-card{
+      padding:16px;
+      border-radius:16px;
+    }
+
+    .delivery-route-stats{
+      gap:8px;
+    }
+  }
 `;
 
 /*
@@ -203,10 +401,18 @@ type CheckoutAddress = {
  */
 
 function money(
-    value: number
+    cents: number
 ) {
-    return value.toLocaleString(
-        "en-US"
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }
+    ).format(
+        cents / 100
     );
 }
 
@@ -283,7 +489,7 @@ export default function Checkout() {
         city,
         setCity,
     ] = useState(
-        "Yerevan"
+        "Los Angeles"
     );
 
     const [
@@ -356,6 +562,95 @@ export default function Checkout() {
         useState<SuccessOrder | null>(
             null
         );
+
+
+    const [
+        deliveryPreview,
+        setDeliveryPreview,
+    ] = useState<DeliveryPreview | null>(
+        null
+    );
+
+    const [
+        loadingDeliveryPreview,
+        setLoadingDeliveryPreview,
+    ] = useState(false);
+
+    const [
+        deliveryPreviewError,
+        setDeliveryPreviewError,
+    ] = useState("");
+
+
+
+
+    async function handleCalculateDelivery() {
+        try {
+            setLoadingDeliveryPreview(true);
+            setDeliveryPreviewError("");
+
+            if (
+                address.trim().length < 3
+            ) {
+                throw new Error(
+                    "Enter your delivery address first."
+                );
+            }
+
+            const response =
+                await fetch(
+                    "/api/maps/delivery-preview",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                        },
+
+                        body: JSON.stringify({
+                            items: items.map(
+                                (item) => ({
+                                    productId:
+                                        Number(item.id),
+
+                                    quantity:
+                                    item.quantity,
+                                })
+                            ),
+
+                            deliveryAddress: address,
+                            deliveryCity: city,
+                            deliveryDistrict: district,
+                        }),
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Unable to calculate delivery route."
+                );
+            }
+
+            setDeliveryPreview(
+                data.preview
+            );
+        } catch (error) {
+            setDeliveryPreview(null);
+
+            setDeliveryPreviewError(
+                error instanceof Error
+                    ? error.message
+                    : "Unable to calculate delivery route."
+            );
+        } finally {
+            setLoadingDeliveryPreview(false);
+        }
+    }
 
     /*
      * =====================================
@@ -536,7 +831,7 @@ export default function Checkout() {
 
                 setCity(
                     defaultAddress.city ||
-                    "Yerevan"
+                    "Los Angeles"
                 );
 
                 /*
@@ -935,7 +1230,7 @@ export default function Checkout() {
 
                 deliveryCity:
                     city.trim() ||
-                    "Yerevan",
+                    "Los Angeles",
 
                 deliveryDistrict:
                     district.trim() ||
@@ -1132,7 +1427,7 @@ export default function Checkout() {
                         successOrder
                             .total
                     )}
-                                        ֏
+
                   </span>
 
                                 </div>
@@ -1449,7 +1744,7 @@ export default function Checkout() {
                                                 className="form-control"
                                                 type="tel"
                                                 autoComplete="tel"
-                                                placeholder="+374 XX XX XX XX"
+                                                placeholder="(213) 555-0123"
                                                 value={
                                                     phone
                                                 }
@@ -1581,15 +1876,21 @@ export default function Checkout() {
                                                 }
                                                 onChange={(
                                                     event
-                                                ) =>
+                                                ) => {
                                                     setCity(
                                                         event.target.value
-                                                    )
-                                                }
+                                                    );
+                                                    setDeliveryPreview(
+                                                        null
+                                                    );
+                                                    setDeliveryPreviewError(
+                                                        ""
+                                                    );
+                                                }}
                                             >
 
-                                                <option value="Yerevan">
-                                                    Yerevan
+                                                <option value="Los Angeles">
+                                                    Los Angeles
                                                 </option>
 
                                             </select>
@@ -1604,23 +1905,29 @@ export default function Checkout() {
                                                 className="form-label"
                                                 htmlFor="district"
                                             >
-                                                District
+                                                Neighborhood
                                             </label>
 
                                             <input
                                                 id="district"
                                                 className="form-control"
-                                                placeholder="e.g. Kentron"
+                                                placeholder="e.g. Hollywood"
                                                 value={
                                                     district
                                                 }
                                                 onChange={(
                                                     event
-                                                ) =>
+                                                ) => {
                                                     setDistrict(
                                                         event.target.value
-                                                    )
-                                                }
+                                                    );
+                                                    setDeliveryPreview(
+                                                        null
+                                                    );
+                                                    setDeliveryPreviewError(
+                                                        ""
+                                                    );
+                                                }}
                                             />
 
                                         </div>
@@ -1641,17 +1948,23 @@ export default function Checkout() {
                                                 id="address"
                                                 className="form-control"
                                                 autoComplete="street-address"
-                                                placeholder="e.g. Northern Ave 12, apt. 18"
+                                                placeholder="e.g. 6801 Hollywood Blvd, Apt. 18"
                                                 value={
                                                     address
                                                 }
                                                 onChange={(
                                                     event
-                                                ) =>
+                                                ) => {
                                                     setAddress(
                                                         event.target.value
-                                                    )
-                                                }
+                                                    );
+                                                    setDeliveryPreview(
+                                                        null
+                                                    );
+                                                    setDeliveryPreviewError(
+                                                        ""
+                                                    );
+                                                }}
                                             />
 
                                         </div>
@@ -1713,7 +2026,7 @@ export default function Checkout() {
                                                     quote
                                                         ? `${money(
                                                             quote.deliveryFee
-                                                        )}֏`
+                                                        )}`
                                                         : "Calculating..."
                                                 }
                                             />
@@ -1721,6 +2034,197 @@ export default function Checkout() {
                                         </div>
 
                                     </div>
+
+                                </div>
+
+                            </div>
+
+                            {/* ===========================
+                  DELIVERY ROUTE
+              =========================== */}
+
+                            <div className="panel mb-4">
+
+                                <div className="panel-head d-flex justify-content-between align-items-center gap-3">
+
+                                    <span>
+                                        Delivery route
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-line btn-sm"
+                                        onClick={
+                                            handleCalculateDelivery
+                                        }
+                                        disabled={
+                                            loadingDeliveryPreview
+                                        }
+                                    >
+                                        {loadingDeliveryPreview
+                                            ? "Calculating..."
+                                            : deliveryPreview
+                                                ? "Recalculate"
+                                                : "Show route"}
+                                    </button>
+
+                                </div>
+
+                                <div className="panel-body">
+
+                                    <p className="muted mb-3">
+                                        Preview where your order is coming
+                                        from, the driving distance and the
+                                        estimated delivery time before you
+                                        place the order.
+                                    </p>
+
+                                    {deliveryPreviewError && (
+                                        <div
+                                            className="alert alert-danger mb-3"
+                                            role="alert"
+                                        >
+                                            {
+                                                deliveryPreviewError
+                                            }
+                                        </div>
+                                    )}
+
+                                    {!deliveryPreview &&
+                                        !deliveryPreviewError && (
+                                            <div
+                                                className="border rounded-4 p-4 text-center"
+                                                style={{
+                                                    background:
+                                                        "var(--surface-2)",
+                                                }}
+                                            >
+                                                <div
+                                                    className="mb-2"
+                                                    style={{
+                                                        fontSize:
+                                                            "1.8rem",
+                                                    }}
+                                                >
+                                                    🗺️
+                                                </div>
+
+                                                <div className="fw-semibold">
+                                                    Your delivery route will
+                                                    appear here
+                                                </div>
+
+                                                <div className="muted mt-1">
+                                                    Enter your address, then
+                                                    select Show route.
+                                                </div>
+                                            </div>
+                                        )}
+
+                                    {deliveryPreview && (
+                                        <>
+                                            <DeliveryMap
+                                                preview={
+                                                    deliveryPreview
+                                                }
+                                            />
+
+                                            <div className="delivery-route-grid">
+                                                {deliveryPreview.restaurants.map(
+                                                    (restaurant) => (
+                                                        <div
+                                                            key={
+                                                                restaurant.restaurantId
+                                                            }
+                                                            className="delivery-route-card"
+                                                        >
+                                                            <div className="delivery-route-head">
+
+                                                                <div className="delivery-route-restaurant">
+
+                                                                    <div className="delivery-route-icon">
+                                                                        🍽️
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <p className="delivery-route-name">
+                                                                            {
+                                                                                restaurant.restaurantName
+                                                                            }
+                                                                        </p>
+
+                                                                        <div className="delivery-route-label">
+                                                                            Restaurant
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <div className="delivery-route-eta">
+                                                                    {
+                                                                        restaurant.estimatedDeliveryMinutes
+                                                                    }{" "}
+                                                                    min ETA
+                                                                </div>
+
+                                                            </div>
+
+                                                            <div className="delivery-route-stats">
+
+                                                                <div className="delivery-route-stat">
+                        <span className="delivery-route-stat-label">
+                            Distance
+                        </span>
+
+                                                                    <span className="delivery-route-stat-value">
+                            {
+                                restaurant.distanceMiles
+                            }{" "}
+                                                                        mi
+                        </span>
+                                                                </div>
+
+                                                                <div className="delivery-route-stat">
+                        <span className="delivery-route-stat-label">
+                            Drive time
+                        </span>
+
+                                                                    <span className="delivery-route-stat-value">
+                            {
+                                restaurant.driveMinutes
+                            }{" "}
+                                                                        min
+                        </span>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+
+                                            <div className="delivery-address-card">
+
+                                                <div className="delivery-address-icon">
+                                                    ⌂
+                                                </div>
+
+                                                <div>
+                                                    <div className="delivery-address-title">
+                                                        Delivering to
+                                                    </div>
+
+                                                    <div className="delivery-address-value">
+                                                        {
+                                                            deliveryPreview.delivery.address
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </>
+                                    )}
 
                                 </div>
 
@@ -1867,7 +2371,7 @@ export default function Checkout() {
                                   {money(
                                       item.price
                                   )}
-                                                                    ֏ each
+                                                                    each
                                 </span>
 
                                                             </div>
@@ -1879,7 +2383,7 @@ export default function Checkout() {
                                                                 item.price *
                                                                 item.quantity
                                                             )}
-                                                            ֏
+
                                                         </div>
 
                                                     </div>
@@ -1905,7 +2409,7 @@ export default function Checkout() {
                                 quote
                                     ?.subtotal ||
                                 0
-                            )}֏`}
+                            )}`}
 
                       </span>
 
@@ -1924,7 +2428,7 @@ export default function Checkout() {
                         {quote
                             ? `${money(
                                 quote.deliveryFee
-                            )}֏`
+                            )}`
                             : "..."}
 
                       </span>
@@ -1946,7 +2450,7 @@ export default function Checkout() {
                                                         ?.discount ||
                                                     0
                                                 )}
-                                                ֏
+
                       </span>
 
                                         </div>
@@ -1964,7 +2468,7 @@ export default function Checkout() {
                         {quote
                             ? `${money(
                                 quote.total
-                            )}֏`
+                            )}`
                             : "..."}
 
                       </span>
@@ -2051,7 +2555,7 @@ export default function Checkout() {
                                             {orderLoading
                                                 ? "Placing order..."
                                                 : quote
-                                                    ? `Place order · ${money(quote.total)}֏`
+                                                    ? `Place order · ${money(quote.total)}`
                                                     : "Place order"}
                                         </button>
 
@@ -2079,3 +2583,5 @@ export default function Checkout() {
         </main>
     );
 }
+
+

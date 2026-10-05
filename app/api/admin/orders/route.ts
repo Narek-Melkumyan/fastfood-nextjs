@@ -60,7 +60,6 @@ export async function GET(
                     discount: true,
                     walletCreditUsed: true,
                     total: true,
-                    currency: true,
 
                     createdAt: true,
                     deliveredAt: true,

@@ -48,8 +48,12 @@ export type ProductData = {
       | string
       | null;
 
+  /*
+   * USD cents.
+   *
+   * 1299 = $12.99
+   */
   price: number;
-  currency: string;
 
   imageUrl:
       | string
@@ -89,6 +93,9 @@ export type ProductData = {
     deliveryMinMinutes: number;
     deliveryMaxMinutes: number;
 
+    /*
+     * USD cents.
+     */
     deliveryFee: number;
     minimumOrder: number;
 
@@ -103,11 +110,37 @@ type Props = {
       ProductData[];
 };
 
+/*
+ * =========================================
+ * USD MONEY FORMATTER
+ * =========================================
+ *
+ * Database values are stored in cents.
+ *
+ * 1299 -> $12.99
+ * 499  -> $4.99
+ * 1500 -> $15.00
+ */
 function money(
-    value: number
+    cents: number
 ) {
-  return value.toLocaleString(
-      "en-US"
+  return new Intl.NumberFormat(
+      "en-US",
+      {
+        style:
+            "currency",
+
+        currency:
+            "USD",
+
+        minimumFractionDigits:
+            2,
+
+        maximumFractionDigits:
+            2,
+      }
+  ).format(
+      cents / 100
   );
 }
 
@@ -212,13 +245,9 @@ export default function Product({
     }
 
     /*
-     * Your current addItem() API adds
-     * one item at a time.
-     *
-     * Calling it quantity times means
-     * selecting 3 adds quantity 3.
+     * Current addItem() adds one unit
+     * at a time.
      */
-
     for (
         let index = 0;
         index < quantity;
@@ -274,7 +303,6 @@ export default function Product({
 
   return (
       <main>
-
         <style>
           {pageStyles}
         </style>
@@ -284,7 +312,6 @@ export default function Product({
       ================================= */}
 
         <section className="section">
-
           <div className="container">
 
             {/* BREADCRUMBS */}
@@ -293,7 +320,6 @@ export default function Product({
                 className="breadcrumbs"
                 aria-label="Breadcrumb"
             >
-
               <Link href="/">
                 Home
               </Link>
@@ -311,11 +337,8 @@ export default function Product({
             </span>
 
               <span>
-              {
-                product.name
-              }
+              {product.name}
             </span>
-
             </nav>
 
             <div className="row g-4 g-xl-5">
@@ -329,7 +352,6 @@ export default function Product({
                 {/* IMAGE */}
 
                 <div className="gallery-main">
-
                   <img
                       className="product-main-image"
                       src={
@@ -339,7 +361,6 @@ export default function Product({
                         product.name
                       }
                   />
-
                 </div>
 
                 {/* INFO */}
@@ -349,9 +370,7 @@ export default function Product({
                   {/* KITCHEN */}
 
                   <div className="col-4">
-
                     <div className="stat-mini text-center">
-
                       <div className="k">
                         Kitchen
                       </div>
@@ -369,17 +388,13 @@ export default function Product({
                               .name
                         }
                       </div>
-
                     </div>
-
                   </div>
 
                   {/* DELIVERY */}
 
                   <div className="col-4">
-
                     <div className="stat-mini text-center">
-
                       <div className="k">
                         Delivery
                       </div>
@@ -404,17 +419,13 @@ export default function Product({
                         }{" "}
                         min
                       </div>
-
                     </div>
-
                   </div>
 
                   {/* REVIEWS */}
 
                   <div className="col-4">
-
                     <div className="stat-mini text-center">
-
                       <div className="k">
                         Reviews
                       </div>
@@ -427,53 +438,45 @@ export default function Product({
                           }}
                       >
                         {
-                          product.reviewCount
+                          product
+                              .reviewCount
                         }
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
 
                 {/* DESCRIPTION */}
 
                 <div className="panel mt-4">
-
                   <div className="panel-head">
                     About this dish
                   </div>
 
                   <div className="panel-body">
-
                     <p className="product-description mb-4">
-
                       {
                           product.description ||
                           "No description available."
                       }
-
                     </p>
 
                     {/* INGREDIENTS */}
 
-                    {product.ingredients
+                    {product
+                            .ingredients
                             .length >
                         0 && (
                             <>
-
                               <h3 className="h6 mb-3">
                                 Ingredients
                               </h3>
 
                               <div className="d-flex flex-wrap gap-2 mb-4">
-
                                 {product.ingredients.map(
                                     (
                                         ingredient
                                     ) => (
-
                                         <span
                                             key={
                                               ingredient
@@ -484,33 +487,28 @@ export default function Product({
                                 ingredient
                               }
                             </span>
-
                                     )
                                 )}
-
                               </div>
-
                             </>
                         )}
 
                     {/* ALLERGENS */}
 
-                    {product.allergens
+                    {product
+                            .allergens
                             .length >
                         0 && (
                             <>
-
                               <h3 className="h6 mb-3">
                                 Allergens
                               </h3>
 
                               <div className="d-flex flex-wrap gap-2">
-
                                 {product.allergens.map(
                                     (
                                         allergen
                                     ) => (
-
                                         <span
                                             key={
                                               allergen
@@ -521,34 +519,27 @@ export default function Product({
                                 allergen
                               }
                             </span>
-
                                     )
                                 )}
-
                               </div>
-
                             </>
                         )}
-
                   </div>
-
                 </div>
 
                 {/* RESTAURANT */}
 
                 <div className="panel mt-4">
-
                   <div className="panel-head">
                     Restaurant
                   </div>
 
                   <div className="panel-body">
-
                     <div className="d-flex align-items-center gap-3">
 
-                      {product.restaurant
+                      {product
+                          .restaurant
                           .logoUrl && (
-
                           <img
                               src={
                                 product
@@ -574,11 +565,9 @@ export default function Product({
                                     "cover",
                               }}
                           />
-
                       )}
 
                       <div>
-
                         <h3 className="h5 mb-1">
                           {
                             product
@@ -607,15 +596,10 @@ export default function Product({
                         >
                           View restaurant
                         </Link>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
 
               {/* ============================
@@ -623,7 +607,6 @@ export default function Product({
             ============================ */}
 
               <div className="col-12 col-lg-5">
-
                 <div className="buy-sticky">
 
                   {/* ========================
@@ -631,13 +614,11 @@ export default function Product({
                 ======================== */}
 
                   <div className="panel">
-
                     <div className="panel-body">
 
                       {/* BADGES */}
 
                       <div className="d-flex flex-wrap gap-2 mb-3">
-
                       <span className="badge-soft is-brand">
                         {
                           product
@@ -662,15 +643,12 @@ export default function Product({
                       </span>
 
                         {product.badge && (
-
                             <span className="badge-soft is-green">
                           {
                             product.badge
                           }
                         </span>
-
                         )}
-
                       </div>
 
                       {/* TITLE */}
@@ -684,7 +662,6 @@ export default function Product({
                       {/* RATING */}
 
                       <div className="d-flex align-items-center gap-2 mb-4">
-
                       <span className="stars">
                         ⭐
                       </span>
@@ -705,22 +682,19 @@ export default function Product({
                             }}
                         >
                         {
-                          product.reviewCount
+                          product
+                              .reviewCount
                         }{" "}
                           reviews
                       </span>
-
                       </div>
 
                       {/* PRICE */}
 
                       <div className="price-xl mb-1">
-
                         {money(
                             product.price
                         )}
-                        ֏
-
                       </div>
 
                       <p
@@ -730,7 +704,6 @@ export default function Product({
                                 ".88rem",
                           }}
                       >
-                        Price includes VAT.
                         Delivery is calculated
                         at checkout.
                       </p>
@@ -742,7 +715,6 @@ export default function Product({
                       <div className="d-flex align-items-center justify-content-between gap-3 mb-4">
 
                         <div className="qty">
-
                           <button
                               type="button"
                               aria-label="Decrease quantity"
@@ -783,11 +755,9 @@ export default function Product({
                           >
                             +
                           </button>
-
                         </div>
 
                         <div className="text-end">
-
                           <div
                               className="muted"
                               style={{
@@ -808,17 +778,13 @@ export default function Product({
                             {money(
                                 lineTotal
                             )}
-                            ֏
                           </div>
-
                         </div>
-
                       </div>
 
                       {/* ACTIONS */}
 
                       <div className="d-grid gap-2">
-
                         <button
                             className="btn btn-brand btn-lg"
                             type="button"
@@ -829,7 +795,6 @@ export default function Product({
                               addToBasket
                             }
                         >
-
                           {!product
                               .isAvailable
                               ? "Unavailable"
@@ -840,7 +805,6 @@ export default function Product({
                                   : added
                                       ? "Added to basket ✓"
                                       : `Add ${quantity} to basket`}
-
                         </button>
 
                         <Link
@@ -849,15 +813,12 @@ export default function Product({
                         >
                           Go to checkout
                         </Link>
-
                       </div>
-
                     </div>
 
                     {/* DELIVERY INFO */}
 
                     <div className="panel-foot">
-
                       <div className="d-flex align-items-center gap-3">
 
                       <span
@@ -898,7 +859,6 @@ export default function Product({
                             strokeLinejoin="round"
                         >
                           <path d="M3 7h11v9H3z" />
-
                           <path d="M14 10h3.5L21 13v3h-7z" />
 
                           <circle
@@ -922,7 +882,6 @@ export default function Product({
                                   ".88rem",
                             }}
                         >
-
                           Delivery fee:{" "}
 
                           <b>
@@ -931,19 +890,15 @@ export default function Product({
                                 .deliveryFee ===
                             0
                                 ? "Free"
-                                : `${money(
+                                : money(
                                     product
                                         .restaurant
                                         .deliveryFee
-                                )}֏`}
+                                )}
                           </b>
-
                         </div>
-
                       </div>
-
                     </div>
-
                   </div>
 
                   {/* ========================
@@ -951,16 +906,13 @@ export default function Product({
                 ======================== */}
 
                   <div className="panel mt-4">
-
                     <div className="panel-head d-flex justify-content-between align-items-center">
-
                     <span>
                       Your basket
                     </span>
 
                       {items.length >
                           0 && (
-
                               <button
                                   className="btn btn-ghost btn-sm"
                                   type="button"
@@ -970,24 +922,18 @@ export default function Product({
                               >
                                 Clear
                               </button>
-
                           )}
-
                     </div>
 
                     <div className="panel-body">
 
                       {!hasHydrated ? (
-
                           <div className="muted">
                             Loading basket...
                           </div>
-
                       ) : items.length ===
                       0 ? (
-
                           <div className="empty-state">
-
                             <div className="ico">
                               🛍️
                             </div>
@@ -995,27 +941,20 @@ export default function Product({
                             <p className="mb-0">
                               Your basket is empty.
                             </p>
-
                           </div>
-
                       ) : (
-
                           <div className="d-grid gap-3">
-
                             {items.map(
                                 (
                                     item
                                 ) => (
-
                                     <div
                                         key={
                                           item.id
                                         }
                                         className="cart-row d-flex justify-content-between gap-3"
                                     >
-
                                       <div>
-
                                         <p className="t mb-1">
                                           {
                                             item.name
@@ -1025,40 +964,29 @@ export default function Product({
                                         <span className="muted">
                                   {money(
                                       item.price
-                                  )}
-                                          ֏ ×{" "}
+                                  )}{" "}
+                                          ×{" "}
                                           {
                                             item.quantity
                                           }
                                 </span>
-
                                       </div>
 
                                       <div className="money">
-
                                         {money(
                                             item.price *
                                             item.quantity
                                         )}
-                                        ֏
-
                                       </div>
-
                                     </div>
-
                                 )
                             )}
-
                           </div>
-
                       )}
-
                     </div>
 
                     <div className="panel-foot">
-
                       <div className="summary-row total">
-
                       <span>
                         Total
                       </span>
@@ -1067,23 +995,14 @@ export default function Product({
                         {money(
                             cartTotal
                         )}
-                          ֏
                       </span>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
         </section>
 
         {/* =================================
@@ -1092,15 +1011,11 @@ export default function Product({
 
         {relatedProducts.length >
             0 && (
-
                 <section className="section section-tint">
-
                   <div className="container">
 
                     <div className="section-head">
-
                       <div>
-
                 <span className="eyebrow">
                   Goes well with
                 </span>
@@ -1113,7 +1028,6 @@ export default function Product({
                           More dishes you may
                           like.
                         </p>
-
                       </div>
 
                       <Link
@@ -1122,11 +1036,9 @@ export default function Product({
                       >
                         Browse the menu
                       </Link>
-
                     </div>
 
                     <div className="row g-4">
-
                       {relatedProducts
                           .slice(
                               0,
@@ -1136,14 +1048,12 @@ export default function Product({
                               (
                                   related
                               ) => (
-
                                   <div
                                       key={
                                         related.id
                                       }
                                       className="col-12 col-md-6 col-xl-4"
                                   >
-
                                     <Link
                                         href={`/products/${related.slug}`}
                                         className="tile h-100"
@@ -1152,7 +1062,6 @@ export default function Product({
                                               "none",
                                         }}
                                     >
-
                                       <div
                                           className="tile-media"
                                           style={{
@@ -1160,7 +1069,6 @@ export default function Product({
                                                 "16/10",
                                           }}
                                       >
-
                                         <img
                                             alt={
                                               related.name
@@ -1170,11 +1078,9 @@ export default function Product({
                                                 "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop"
                                             }
                                         />
-
                                       </div>
 
                                       <div className="tile-body">
-
                                         <h3 className="tile-title">
                                           {
                                             related.name
@@ -1182,7 +1088,6 @@ export default function Product({
                                         </h3>
 
                                         <p className="tile-meta">
-
                                           {
                                             related
                                                 .restaurant
@@ -1203,11 +1108,9 @@ export default function Product({
                                                 .deliveryMaxMinutes
                                           }{" "}
                                           min
-
                                         </p>
 
                                         <div className="d-flex justify-content-between align-items-center mt-auto">
-
                             <span className="rating">
                               ⭐{" "}
                               {related
@@ -1221,28 +1124,17 @@ export default function Product({
                               {money(
                                   related.price
                               )}
-                                            ֏
                             </span>
-
                                         </div>
-
                                       </div>
-
                                     </Link>
-
                                   </div>
-
                               )
                           )}
-
                     </div>
-
                   </div>
-
                 </section>
-
             )}
-
       </main>
   );
 }

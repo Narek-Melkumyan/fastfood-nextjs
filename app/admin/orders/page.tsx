@@ -65,9 +65,12 @@ const statuses: OrderStatus[] = [
     "REFUNDED",
 ];
 
-function money(value: number) {
-    return value.toLocaleString("en-US");
-}
+function money(cents: number) {
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    }).format(cents / 100);
+} 
 
 function readableStatus(status: string) {
     return status
@@ -488,8 +491,7 @@ export default function AdminOrdersPage() {
                                             </td>
 
                                             <td className="fw-bold">
-                                                {money(order.total)}֏
-                                            </td>
+                                                {money(order.total)}                                             </td>
 
                                             <td>
                           <span
@@ -572,16 +574,14 @@ export default function AdminOrdersPage() {
                                                                                             {money(
                                                                                                 item.unitPrice
                                                                                             )}
-                                                                                            ֏
-                                                                                        </div>
+                                                                                                                                                                                     </div>
                                                                                     </div>
 
                                                                                     <strong>
                                                                                         {money(
                                                                                             item.lineTotal
                                                                                         )}
-                                                                                        ֏
-                                                                                    </strong>
+                                                                                                                                                                             </strong>
                                                                                 </div>
                                                                             )
                                                                         )}
@@ -599,8 +599,7 @@ export default function AdminOrdersPage() {
                                         {money(
                                             order.subtotal
                                         )}
-                                                                                ֏
-                                      </span>
+                                                                                                                       </span>
                                                                         </div>
 
                                                                         <div className="d-flex justify-content-between">
@@ -612,8 +611,7 @@ export default function AdminOrdersPage() {
                                         {money(
                                             order.deliveryFee
                                         )}
-                                                                                ֏
-                                      </span>
+                                                                                                                       </span>
                                                                         </div>
 
                                                                         <div className="d-flex justify-content-between">
@@ -626,8 +624,7 @@ export default function AdminOrdersPage() {
                                                                                 {money(
                                                                                     order.discount
                                                                                 )}
-                                                                                ֏
-                                      </span>
+                                                                                                                       </span>
                                                                         </div>
 
                                                                         {order.walletCreditUsed >
@@ -642,8 +639,7 @@ export default function AdminOrdersPage() {
                                                                                         {money(
                                                                                             order.walletCreditUsed
                                                                                         )}
-                                                                                        ֏
-                                        </span>
+                                                                                                                                 </span>
                                                                                 </div>
                                                                             )}
 
@@ -656,8 +652,7 @@ export default function AdminOrdersPage() {
                                         {money(
                                             order.total
                                         )}
-                                                                                ֏
-                                      </span>
+                                                                                                                       </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>

@@ -326,7 +326,6 @@ export async function PATCH(
                     slug: true,
                     description: true,
                     price: true,
-                    currency: true,
                     imageUrl: true,
                     ingredients: true,
                     allergens: true,

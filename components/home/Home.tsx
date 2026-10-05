@@ -470,8 +470,7 @@ export default function Home({ products }: Props) {
                           </span>
 
                                 <span className="price">
-                            {money(product.price)}֏
-                          </span>
+                            {money(product.price)}                           </span>
                               </div>
 
                               <div className="d-grid gap-2 mt-3">
@@ -607,8 +606,7 @@ export default function Home({ products }: Props) {
                     </div>
 
                     <p className="tile-meta">
-                      25–35 min · Delivery from 500֏
-                    </p>
+                      25–35 min · Delivery from 500                     </p>
 
                     <div className="d-flex gap-2 flex-wrap mt-auto">
                       <span className="badge-soft is-green">Open now</span>
@@ -649,8 +647,7 @@ export default function Home({ products }: Props) {
                     </div>
 
                     <p className="tile-meta">
-                      20–30 min · Delivery from 400֏
-                    </p>
+                      20–30 min · Delivery from 400                     </p>
 
                     <div className="d-flex gap-2 flex-wrap mt-auto">
                       <span className="badge-soft is-green">Open now</span>
@@ -691,8 +688,7 @@ export default function Home({ products }: Props) {
                     </div>
 
                     <p className="tile-meta">
-                      30–40 min · Delivery from 600֏
-                    </p>
+                      30–40 min · Delivery from 600                     </p>
 
                     <div className="d-flex gap-2 flex-wrap mt-auto">
                       <span className="badge-soft is-green">Open now</span>

@@ -520,11 +520,8 @@ export default function Products({
                           </span>
 
                                                     <span className="price">
-                            {money(
-                                product.price
-                            )}
-                                                        ֏
-                          </span>
+                                                            {money(product.price)}
+                                                    </span>
 
                                                 </div>
 

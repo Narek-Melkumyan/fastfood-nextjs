@@ -51,7 +51,6 @@ type Order = {
     discount: number;
     walletCreditUsed: number;
     total: number;
-    currency: string;
 
     createdAt: string;
     deliveredAt: string | null;
@@ -61,10 +60,16 @@ type Order = {
 };
 
 function money(
-    value: number
+    cents: number
 ) {
-    return value.toLocaleString(
-        "en-US"
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+        }
+    ).format(
+        cents / 100
     );
 }
 
@@ -382,8 +387,7 @@ export default function OrderDetailsPage() {
                                                         {money(
                                                             item.unitPrice
                                                         )}
-                                                        ֏
-                                                    </td>
+                                                                                                             </td>
 
                                                     <td>
                                                         {
@@ -395,8 +399,7 @@ export default function OrderDetailsPage() {
                                                         {money(
                                                             item.lineTotal
                                                         )}
-                                                        ֏
-                                                    </td>
+                                                                                                             </td>
                                                 </tr>
                                             )
                                         )}
@@ -522,8 +525,7 @@ export default function OrderDetailsPage() {
                     {money(
                         order.subtotal
                     )}
-                                        ֏
-                  </span>
+                                                           </span>
                                 </div>
 
                                 <div className="d-flex justify-content-between mb-2">
@@ -535,8 +537,7 @@ export default function OrderDetailsPage() {
                     {money(
                         order.deliveryFee
                     )}
-                                        ֏
-                  </span>
+                                                           </span>
                                 </div>
 
                                 {order.discount >
@@ -551,8 +552,7 @@ export default function OrderDetailsPage() {
                                                 {money(
                                                     order.discount
                                                 )}
-                                                ֏
-                    </span>
+                                                                     </span>
                                         </div>
                                     )}
 
@@ -568,8 +568,7 @@ export default function OrderDetailsPage() {
                                                 {money(
                                                     order.walletCreditUsed
                                                 )}
-                                                ֏
-                    </span>
+                                                                     </span>
                                         </div>
                                     )}
 
@@ -584,8 +583,7 @@ export default function OrderDetailsPage() {
                     {money(
                         order.total
                     )}
-                                        ֏
-                  </span>
+                                                           </span>
                                 </div>
 
                                 <hr />

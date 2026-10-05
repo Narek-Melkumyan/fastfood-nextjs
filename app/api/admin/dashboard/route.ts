@@ -110,7 +110,6 @@ export async function GET(
                         customerPhone: true,
 
                         total: true,
-                        currency: true,
 
                         createdAt: true,
 

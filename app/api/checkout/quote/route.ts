@@ -21,12 +21,85 @@ export async function POST(
     request: Request
 ) {
     try {
-        const body =
-            (await request.json()) as Body;
+        /*
+         * =====================================
+         * READ REQUEST BODY SAFELY
+         * =====================================
+         */
+
+        const rawBody =
+            await request.text();
+
+        if (!rawBody.trim()) {
+            return NextResponse.json(
+                {
+                    error:
+                        "Request body is required.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+
+        let body: Body;
+
+        try {
+            body =
+                JSON.parse(
+                    rawBody
+                ) as Body;
+        } catch {
+            return NextResponse.json(
+                {
+                    error:
+                        "Invalid JSON request body.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+
+        /*
+         * =====================================
+         * VALIDATION
+         * =====================================
+         */
+
+        if (!Array.isArray(body.items)) {
+            return NextResponse.json(
+                {
+                    error:
+                        "Basket items are required.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+
+        if (body.items.length === 0) {
+            return NextResponse.json(
+                {
+                    error:
+                        "Your basket is empty.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+
+        /*
+         * =====================================
+         * CALCULATE CHECKOUT
+         * =====================================
+         */
 
         const quote =
             await calculateCheckout(
-                body.items || [],
+                body.items,
                 body.promoCode,
                 {
                     phone:
@@ -37,26 +110,43 @@ export async function POST(
                 }
             );
 
-        return NextResponse.json({
-            subtotal:
-            quote.subtotal,
+        /*
+         * =====================================
+         * RESPONSE
+         * =====================================
+         */
 
-            deliveryFee:
-            quote.deliveryFee,
+        return NextResponse.json(
+            {
+                subtotal:
+                quote.subtotal,
 
-            discount:
-            quote.discount,
+                deliveryFee:
+                quote.deliveryFee,
 
-            total:
-            quote.total,
+                discount:
+                quote.discount,
 
-            promotionSavings:
-            quote.promotionSavings,
+                total:
+                quote.total,
 
-            promotion:
-            quote.promotion,
-        });
+                promotionSavings:
+                quote.promotionSavings,
+
+                promotion:
+                quote.promotion,
+            },
+            {
+                status: 200,
+            }
+        );
     } catch (error) {
+        /*
+         * =====================================
+         * CHECKOUT ERROR
+         * =====================================
+         */
+
         if (
             error instanceof
             CheckoutError
@@ -72,6 +162,12 @@ export async function POST(
                 }
             );
         }
+
+        /*
+         * =====================================
+         * UNKNOWN ERROR
+         * =====================================
+         */
 
         console.error(
             "CHECKOUT QUOTE ERROR:",
