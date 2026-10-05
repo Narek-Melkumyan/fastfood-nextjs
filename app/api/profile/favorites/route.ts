@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
                         description: true,
 
                         price: true,
-                        currency: true,
 
                         imageUrl: true,
                         badge: true,

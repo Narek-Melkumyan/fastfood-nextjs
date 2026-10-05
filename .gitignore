@@ -6,3 +6,8 @@ node_modules
 tsconfig.tsbuildinfo
 
 /generated/prisma.DS_Store
+
+/public/maplibre/
+.DS_Store
+
+

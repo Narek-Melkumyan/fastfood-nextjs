@@ -375,8 +375,7 @@ export async function POST(
                                 total:
                                 quote.total,
 
-                                currency:
-                                    "AMD",
+
 
                                 /*
                                  * Promotion
@@ -429,8 +428,6 @@ export async function POST(
                                 discount: true,
 
                                 total: true,
-
-                                currency: true,
 
                                 createdAt: true,
 
